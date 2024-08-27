@@ -25,9 +25,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    fontFamily: "RobotoMono-Bold",
+    fontFamily: "robotomono-bold",
     textAlign: "center",
     color: Colors.primaryBold,
-    fontWeight: "bold",
   },
 });

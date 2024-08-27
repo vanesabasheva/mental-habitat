@@ -7,8 +7,6 @@ import FlatButton from "../ui/ButtonFlat";
 import { signUpUser } from "../util/auth";
 
 function SignUpScreen({ navigation }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     email: false,
@@ -16,7 +14,7 @@ function SignUpScreen({ navigation }) {
   });
   const authCtx = useContext(AuthContext);
 
-  async function authenticateHandler() {
+  async function authenticateHandler(email, password) {
     setIsLoading(true);
     try {
       const token = await signUpUser(email, password);
@@ -24,7 +22,7 @@ function SignUpScreen({ navigation }) {
     } catch (e) {
       //TODO: add error message
       Alert.alert(
-        "Sign Up failed!",
+        "Signing Up failed!",
         "Could not sign you in. Please check again later or check credentials. "
       );
       setIsLoading(false);
@@ -46,7 +44,7 @@ function SignUpScreen({ navigation }) {
       });
       return;
     }
-    authenticateHandler();
+    authenticateHandler(email, password);
   }
 
   function changeSignMode() {
@@ -68,7 +66,7 @@ function SignUpScreen({ navigation }) {
           credentialsInvalid={credentialsInvalid}
         />
         <View style={styles.buttons}>
-          <Text style={{ fontFamily: "RobotoMono-Bold" }}>
+          <Text style={{ fontFamily: "robotomono-bold" }}>
             ALREADY HAVE A MISSION?
           </Text>
           <FlatButton onPress={changeSignMode}>{"Log in instead"}</FlatButton>
@@ -80,7 +78,7 @@ function SignUpScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   label: {
-    fontFamily: "RobotoMono-Bold",
+    fontFamily: "robotomono-bold",
     fontSize: 32,
     marginLeft: 36,
     marginRight: 200,
@@ -92,8 +90,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
 
-    elevation: 2,
-    shadowColor: "black",
+    shadowColor: "grey",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.15,
     shadowRadius: 4,

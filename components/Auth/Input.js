@@ -1,5 +1,4 @@
 import { View, Text, TextInput, StyleSheet } from "react-native";
-
 import { Colors } from "../../constants/Colors";
 
 function Input({
@@ -36,7 +35,7 @@ const styles = StyleSheet.create({
   label: {
     color: "black",
     marginBottom: 4,
-    fontFamily: "RobotoMono-Bold",
+    fontFamily: "robotomono-bold",
   },
   labelInvalid: {
     color: Colors.error500,

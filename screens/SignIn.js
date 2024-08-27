@@ -1,5 +1,5 @@
 import { AuthContext } from "../store/auth-context";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import AuthForm from "../components/Auth/AuthForm";
 import FlatButton from "../ui/ButtonFlat";
@@ -7,16 +7,15 @@ import LoadingOverlay from "../ui/LoadingOverlay";
 import { signInUser } from "../util/auth";
 
 function SignInScreen({ navigation }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     email: false,
     password: false,
   });
   const authCtx = useContext(AuthContext);
 
-  async function authenticateHandler() {
+  async function authenticateHandler(email, password) {
     setIsLoading(true);
     try {
       const token = await signInUser(email, password);
@@ -46,7 +45,7 @@ function SignInScreen({ navigation }) {
       });
       return;
     }
-    authenticateHandler();
+    authenticateHandler(email, password);
   }
 
   function changeSignMode() {
@@ -67,7 +66,7 @@ function SignInScreen({ navigation }) {
           credentialsInvalid={credentialsInvalid}
         />
         <View style={styles.buttons}>
-          <Text style={{ fontFamily: "RobotoMono-Bold" }}>
+          <Text style={{ fontFamily: "robotomono-bold" }}>
             DON'T HAVE A MISSION?
           </Text>
           <FlatButton onPress={changeSignMode}>{"Register"}</FlatButton>
@@ -84,8 +83,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     //backgroundColor: Colors.primaryLight,
-    elevation: 2,
-    shadowColor: "black",
+    //elevation: 1,
+    shadowColor: "grey",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -97,7 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   label: {
-    fontFamily: "RobotoMono-Bold",
+    fontFamily: "robotomono-bold",
     fontSize: 32,
     marginLeft: 42,
     marginRight: 200,

@@ -25,10 +25,13 @@
     },
     "plugins": [
       "expo-secure-store",
-      {
-        "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
-      },
-      "expo-font"
+      [
+        "expo-font",
+        {
+          "fonts": ["./assets/fonts/RobotoMono-Bold.ttf",
+                    "./assets/fonts/RobotoMono-Regular.ttf"]
+        }
+      ]
     ]
   }
 }

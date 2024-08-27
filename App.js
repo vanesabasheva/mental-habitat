@@ -1,6 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { Colors } from "./constants/Colors";
@@ -8,7 +7,10 @@ import AuthContextProvider, { AuthContext } from "./store/auth-context";
 import HomeScreen from "./screens/Home";
 import SignInScreen from "./screens/SignIn";
 import SignUpScreen from "./screens/SignUp";
-
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import { View, Text } from "react-native";
+//SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 
 function Navigation() {
@@ -37,6 +39,25 @@ function Navigation() {
 }
 
 export default function App() {
+  const [loaded, error] = useFonts({
+    "robotomono-bold": require("./assets/fonts/RobotoMono-Bold.ttf"),
+    "robotomono-regular": require("./assets/fonts/RobotoMono-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return (
+      <View>
+        <Text>Fonts not loaded</Text>
+      </View>
+    );
+  }
+
   return (
     <>
       <StatusBar />
@@ -46,12 +67,3 @@ export default function App() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
