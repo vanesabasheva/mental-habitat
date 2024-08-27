@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   message: {
+    fontFamily: "robotomono-bold",
     fontSize: 16,
     marginBottom: 12,
   },

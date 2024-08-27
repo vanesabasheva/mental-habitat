@@ -24,7 +24,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Allow MentalHabitat to access your Face ID biometric data."
+        }
+      ],
       [
         "expo-font",
         {

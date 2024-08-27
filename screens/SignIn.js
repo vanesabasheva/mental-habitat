@@ -49,7 +49,7 @@ function SignInScreen({ navigation }) {
   }
 
   function changeSignMode() {
-    navigation.navigate("SignUp");
+    navigation.navigate("Sign Up");
   }
 
   if (isLoading) {

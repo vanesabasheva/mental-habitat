@@ -10,6 +10,7 @@ import SignUpScreen from "./screens/SignUp";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { View, Text } from "react-native";
+import IconButton from "./ui/ButtonIcon";
 //SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 
@@ -25,12 +26,25 @@ function Navigation() {
         }}>
         {authCtx.isSignedIn ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={{
+                headerRight: () => (
+                  <IconButton
+                    icon="exit-outline"
+                    size={32}
+                    color={Colors.primaryBold}
+                    onPress={authCtx.signOut}
+                  />
+                ),
+              }}
+            />
           </>
         ) : (
           <>
-            <Stack.Screen name="SignIn" component={SignInScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="Sign In" component={SignInScreen} />
+            <Stack.Screen name="Sign Up" component={SignUpScreen} />
           </>
         )}
       </Stack.Navigator>

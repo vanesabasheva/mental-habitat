@@ -5,6 +5,7 @@ import { AuthContext } from "../store/auth-context";
 import AuthForm from "../components/Auth/AuthForm";
 import FlatButton from "../ui/ButtonFlat";
 import { signUpUser } from "../util/auth";
+import LoadingOverlay from "../ui/LoadingOverlay";
 
 function SignUpScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +49,7 @@ function SignUpScreen({ navigation }) {
   }
 
   function changeSignMode() {
-    navigation.navigate("SignIn");
+    navigation.navigate("Sign In");
   }
 
   if (isLoading) {
