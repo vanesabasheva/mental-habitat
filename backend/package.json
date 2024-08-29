@@ -1,0 +1,20 @@
+{
+  "name": "mental-habitat-backend",
+  "version": "1.0.0",
+  "description": "Backend Server for storing users, user data of MentalHabitat Mobile App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vanesabasheva/mental-habitat.git"
+  },
+  "author": "Vanesa Basheva",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vanesabasheva/mental-habitat/issues"
+  },
+  "homepage": "https://github.com/vanesabasheva/mental-habitat#readme"
+}
