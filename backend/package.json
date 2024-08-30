@@ -16,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/vanesabasheva/mental-habitat/issues"
   },
-  "homepage": "https://github.com/vanesabasheva/mental-habitat#readme"
+  "homepage": "https://github.com/vanesabasheva/mental-habitat#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0"
+  }
 }
