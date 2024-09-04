@@ -1,3 +1,4 @@
+import "./gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,6 +12,8 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { View, Text } from "react-native";
 import IconButton from "./ui/ButtonIcon";
+import BottomTab from "./components/Navigation/BottomTab";
+import DrawerNav from "./components/Navigation/Drawer";
 //SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 
@@ -27,9 +30,10 @@ function Navigation() {
         {authCtx.isSignedIn ? (
           <>
             <Stack.Screen
-              name="Home"
-              component={HomeScreen}
+              name="Root"
+              component={BottomTab}
               options={{
+                headerShown: false,
                 headerRight: () => (
                   <IconButton
                     icon="exit-outline"
