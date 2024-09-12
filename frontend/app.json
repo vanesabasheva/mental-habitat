@@ -33,10 +33,13 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/RobotoMono-Bold.ttf",
-                    "./assets/fonts/RobotoMono-Regular.ttf"]
+          "fonts": [
+            "./assets/fonts/RobotoMono-Bold.ttf",
+            "./assets/fonts/RobotoMono-Regular.ttf"
+          ]
         }
-      ]
+      ],
+      "expo-asset"
     ]
   }
 }

@@ -10,6 +10,10 @@ const userSchema = new Schema(
     firstName: { type: String, required: true },
     password: { type: String, required: true },
     hasCompletedSurvey: Boolean,
+    habits: [{ habitId: { type: Schema.Types.ObjectId, ref: "Habit" } }],
+    questionAnswers: [
+      { answerId: { type: Schema.Types.ObjectId, ref: "Questionnaire" } },
+    ],
   },
   { collection: "User" }
 );

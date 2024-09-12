@@ -6,4 +6,5 @@ export const Colors = {
   primaryGrey: "#C3B6D7",
   error100: "#fcdcbf",
   error500: "#f37c13",
+  primaryText: "#333",
 };

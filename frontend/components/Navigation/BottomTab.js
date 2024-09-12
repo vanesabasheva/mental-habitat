@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../../screens/Home";
-const Tab = createBottomTabNavigator();
 import { Ionicons } from "@expo/vector-icons";
 import HabitsScreen from "../../screens/Habits";
 import DrawerNav from "./Drawer";
 import { Colors } from "../../constants/Colors";
+import MessagesScreen from "../../screens/Messages";
+import Settings from "../../screens/Settings";
 
+const Tab = createBottomTabNavigator();
 function BottomTab() {
   return (
     <Tab.Navigator
@@ -17,10 +19,26 @@ function BottomTab() {
           } else if (route.name === "Habits") {
             iconName = focused ? "bookmark" : "bookmark-outline";
           } else if (route.name === "Drawer") {
-            iconName = "menu";
+            iconName = focused ? "person-circle" : "person-circle-outline";
+          } else if (route.name === "Messages") {
+            iconName = focused
+              ? "chatbubble-ellipses"
+              : "chatbubble-ellipses-outline";
           }
 
           return <Ionicons name={iconName} size={32} color={color} />;
+        },
+        tabBarStyle: {
+          position: "absolute",
+          margin: 40,
+          paddingTop: 20,
+          borderTopWidth: 0,
+          borderRadius: 42,
+          elevation: 1,
+          shadowColor: Colors.primaryBold,
+          shadowRadius: 4,
+          shadowOffset: { width: 1, height: 1 },
+          shadowOpacity: 0.2,
         },
         headerShown: false,
         tabBarShowLabel: false,
@@ -42,9 +60,10 @@ function BottomTab() {
           //tabBarIcon: () => <Ionicons name="bookmark-outline" size={32} />,
         }}
       />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen
         name="Drawer"
-        component={DrawerNav}
+        component={Settings}
         options={{
           tabBarShowLabel: false,
           //tabBarIcon: () => <Ionicons name="menu-outline" size={32} />,
