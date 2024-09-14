@@ -6,6 +6,7 @@ import {
   Dimensions,
   Modal,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import Button from "../ui/Button";
@@ -16,10 +17,50 @@ import MonthlyCalendar from "../components/Calendar/MonthlyCalendar";
 import HabitsList from "../components/Habits/HabitsList";
 import { Ionicons } from "@expo/vector-icons";
 import NewGoalIcon from "../assets/svgs/NewGoalIcon.svg";
+import BackgroundStars from "../assets/svgs/BackgroundStarsSmall.svg";
+import Sky from "../assets/svgs/Sky.svg";
+import CategoryPicker from "../components/Habits/NewHabit/CategoryPicker";
+import NewSmokingHabitForm from "../components/Habits/NewHabit/FormSmoking";
+import NewExerciseHabitForm from "../components/Habits/NewHabit/FormExercise";
+import NewAlcoholHabitForm from "../components/Habits/NewHabit/FormAlcohol";
+import NewDietHabitForm from "../components/Habits/NewHabit/FormDiet";
+
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
 
 function HabitsScreen() {
   const [selectedDate, setSelectedDate] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+
+  function saveHabit(habitObject) {
+    console.log(habitObject);
+    setModalVisible(false);
+  }
+
+  const [currentForm, setCurrentForm] = useState(
+    <NewSmokingHabitForm onAddNewHabit={saveHabit} />
+  );
+  function pickCategoryHandler(category) {
+    console.log(category);
+
+    switch (category) {
+      case "Smoking":
+        setCurrentForm(<NewSmokingHabitForm onAddNewHabit={saveHabit} />);
+        break;
+      case "Exercise":
+        setCurrentForm(<NewExerciseHabitForm onAddNewHabit={saveHabit} />);
+        break;
+      case "Alcohol":
+        setCurrentForm(<NewAlcoholHabitForm onAddNewHabit={saveHabit} />);
+        break;
+      case "Diet":
+        setCurrentForm(<NewDietHabitForm onAddNewHabit={saveHabit} />);
+        break;
+      default:
+        break;
+    }
+    //setCurrentForm(<NewSmokingHabitForm  />);
+  }
 
   return (
     <>
@@ -27,6 +68,7 @@ function HabitsScreen() {
         <View style={styles.header}>
           <Text style={styles.headerText}>Your mission</Text>
           <Button onPress={() => setModalVisible(true)}>&#43; New Habit</Button>
+
           <Modal
             animationType="slide"
             transparent={true}
@@ -35,17 +77,47 @@ function HabitsScreen() {
               Alert.alert("Modal has been closed.");
               setModalVisible(!modalVisible);
             }}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <Pressable
-                  style={({ pressed }) => (pressed ? [{ opacity: 0.7 }] : null)}
-                  onPress={() => setModalVisible(!modalVisible)}>
-                  <Ionicons name="remove" size={32} color="black" />
-                </Pressable>
-                <NewGoalIcon width={160} height={160} />
-                <Text style={styles.modalText}>Add a new habit</Text>
+            <ScrollView
+              style={{ marginTop: deviceHeight / 6 }}
+              automaticallyAdjustKeyboardInsets={true}>
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <Pressable
+                    style={({ pressed }) =>
+                      pressed ? [{ opacity: 0.7 }] : null
+                    }
+                    onPress={() => setModalVisible(!modalVisible)}>
+                    <Ionicons name="remove" size={32} color="black" />
+                  </Pressable>
+                  <View>
+                    <BackgroundStars
+                      width={160}
+                      height={160}
+                      style={{ transform: [{ rotate: "90deg" }] }}
+                    />
+                    <NewGoalIcon
+                      style={{ position: "absolute" }}
+                      width={160}
+                      height={160}
+                    />
+                  </View>
+                  <View>
+                    <Sky
+                      style={{
+                        position: "absolute",
+                        top: -deviceHeight / 9,
+                        right: -deviceWidth / 12,
+                      }}
+                      width={deviceWidth}
+                      height={deviceHeight / 2}
+                    />
+                    <Text style={styles.modalText}>Add a new habit</Text>
+                    <CategoryPicker onPickedCategory={pickCategoryHandler} />
+                    {currentForm}
+                  </View>
+                </View>
               </View>
-            </View>
+            </ScrollView>
           </Modal>
         </View>
 
@@ -83,13 +155,13 @@ const styles = StyleSheet.create({
     //marginTop: 22,
   },
   modalView: {
-    height: Dimensions.get("window").height / 1.5,
-    width: Dimensions.get("window").width,
+    height: deviceHeight / 1.2,
+    width: deviceWidth,
     margin: 0,
     backgroundColor: "white",
     borderRadius: 20,
     paddingTop: 10,
-    padding: 40,
+    paddingHorizontal: 40,
     alignItems: "center",
     shadowColor: "#333",
     shadowOffset: {
@@ -106,7 +178,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   modalText: {
-    marginBottom: 15,
+    marginBottom: 10,
     textAlign: "center",
     fontSize: 24,
     fontFamily: "robotomono-bold",
