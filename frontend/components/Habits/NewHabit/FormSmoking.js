@@ -34,53 +34,55 @@ function NewSmokingHabitForm({ onAddNewHabit }) {
   }
   return (
     <View style={styles.container}>
-      <Text
-        style={{
-          color: Colors.primaryText,
-          fontSize: 14,
-          fontFamily: "robotomono-bold",
-          paddingHorizontal: 12,
-        }}>
-        Title
-      </Text>
+      <View>
+        <Text
+          style={{
+            color: Colors.primaryText,
+            fontSize: 14,
+            fontFamily: "robotomono-bold",
+            paddingHorizontal: 12,
+          }}>
+          Title
+        </Text>
 
-      <TextInput
-        onChangeText={setTitle}
-        value={title}
-        maxLength={40}
-        placeholder="Write a positive, action-oriented title"
-        style={styles.input}
-      />
-      {errors.titleError && (
-        <Text style={styles.errorText}>{errors.titleError}</Text>
-      )}
+        <TextInput
+          onChangeText={setTitle}
+          value={title}
+          maxLength={40}
+          placeholder="Write a positive, action-oriented title"
+          style={styles.input}
+        />
+        {errors.titleError && (
+          <Text style={styles.errorText}>{errors.titleError}</Text>
+        )}
+      </View>
 
-      <Text
-        style={{
-          color: Colors.primaryText,
-          fontSize: 14,
-          fontFamily: "robotomono-bold",
-          paddingHorizontal: 12,
-        }}>
-        Cigarettes/day
-      </Text>
-      <TextInput
-        onChangeText={setNumberOfCigarettes}
-        value={numberOfCigarettes}
-        style={styles.input}
-        maxLength={2}
-        keyboardType="numeric"
-      />
-      {errors.cigaretteError && (
-        <Text style={styles.errorText}>{errors.cigaretteError}</Text>
-      )}
-
+      <View>
+        <Text
+          style={{
+            color: Colors.primaryText,
+            fontSize: 14,
+            fontFamily: "robotomono-bold",
+            paddingHorizontal: 12,
+          }}>
+          Cigarettes/day
+        </Text>
+        <TextInput
+          onChangeText={setNumberOfCigarettes}
+          value={numberOfCigarettes}
+          style={styles.input}
+          maxLength={2}
+          keyboardType="numeric"
+        />
+        {errors.cigaretteError && (
+          <Text style={styles.errorText}>{errors.cigaretteError}</Text>
+        )}
+      </View>
       <Button
         textStyles={{ fontFamily: "robotomono-bold" }}
         newStyles={{
           width: Dimensions.get("window").width,
           alignSelf: "center",
-          marginTop: Dimensions.get("window").height / 15,
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>
@@ -94,7 +96,7 @@ export const styles = StyleSheet.create({
   container: {
     borderRadius: 42,
     backgroundColor: Colors.primaryBackgroundLight,
-    height: Dimensions.get("window").height / 5,
+    // height: Dimensions.get("window").height / 5,
     width: Dimensions.get("window").width / 1.2,
     elevation: 2,
     shadowColor: "#333",
@@ -106,6 +108,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     padding: 16,
     marginTop: 12,
+    gap: 6,
   },
   input: {
     backgroundColor: Colors.primaryBackground,

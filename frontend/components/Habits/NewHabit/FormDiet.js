@@ -66,7 +66,12 @@ function NewDietHabitForm({ onAddNewHabit }) {
         value={title}
         maxLength={40}
         placeholder="Write a positive, action-oriented title"
-        style={styles.input}
+        style={{
+          backgroundColor: Colors.primaryBackground,
+          padding: 14,
+          borderRadius: 42,
+          marginBottom: 4,
+        }}
       />
       {errors.titleError && (
         <Text style={styles.errorText}>{errors.titleError}</Text>
@@ -111,7 +116,6 @@ function NewDietHabitForm({ onAddNewHabit }) {
         newStyles={{
           width: Dimensions.get("window").width,
           alignSelf: "center",
-          marginTop: Dimensions.get("window").height / 20,
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>

@@ -79,9 +79,7 @@ function NewAlcoholHabitForm({ onAddNewHabit }) {
       <Button
         textStyles={{ fontFamily: "robotomono-bold" }}
         newStyles={{
-          width: Dimensions.get("window").width,
           alignSelf: "center",
-          marginTop: Dimensions.get("window").height / 15,
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>

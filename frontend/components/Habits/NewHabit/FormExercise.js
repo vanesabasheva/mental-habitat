@@ -154,19 +154,19 @@ function NewExerciseHabitForm({ onAddNewHabit }) {
           </View>
         )}
       </View>
-      <Text style={styles.label}>Days of the week</Text>
-      <SelectWeekDays onChange={selectedDaysHandler} />
-
-      {errors.daysError && (
-        <Text style={styles.errorText}>{errors.daysError}</Text>
-      )}
+      <View>
+        <Text style={styles.label}>Days of the week</Text>
+        <SelectWeekDays onChange={selectedDaysHandler} />
+        {errors.daysError && (
+          <Text style={styles.errorText}>{errors.daysError}</Text>
+        )}
+      </View>
 
       <Button
         textStyles={{ fontFamily: "robotomono-bold" }}
         newStyles={{
           width: Dimensions.get("window").width,
           alignSelf: "center",
-          marginTop: Dimensions.get("window").height / 20,
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>
@@ -180,7 +180,7 @@ export const styles = StyleSheet.create({
   container: {
     borderRadius: 42,
     backgroundColor: Colors.primaryBackgroundLight,
-    height: Dimensions.get("window").height / 4,
+    //height: Dimensions.get("window").height / 3.5,
     width: Dimensions.get("window").width / 1.2,
     elevation: 2,
     shadowColor: "#333",
@@ -192,7 +192,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     padding: 16,
     marginTop: 12,
-    gap: 2,
+    gap: 6,
   },
   modalContainer: {
     flex: 1,
