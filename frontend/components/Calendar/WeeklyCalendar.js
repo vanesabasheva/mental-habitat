@@ -1,39 +1,36 @@
 import { Agenda } from "react-native-calendars";
-import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, SafeAreaView, StyleSheet, Dimensions } from "react-native";
 import { Colors } from "../../constants/Colors";
-function WeeklyAgenda() {
+//import { HABITS } from "../../screens/Habits";
+import HabitItem from "../Habits/HabitItem";
+
+function WeeklyAgenda({ habits }) {
   const CALENDAR_THEME = {
-    backgroundColor: Colors.primaryBackgroundLight,
     calendarBackground: Colors.primaryBackgroundLight,
-    textSectionTitleColor: "#b6c1cd",
-    textSectionTitleDisabledColor: "#d9e1e8",
+    textSectionTitleColor: "#b6c1cd", //color of Mon, Tue, Wed ...
+    textSectionTitleDisabledColor: Colors.primaryBackgroundLight,
     selectedDayBackgroundColor: Colors.primaryGrey,
     selectedDayTextColor: Colors.primaryText,
     todayTextColor: Colors.primaryText,
     dayTextColor: "#2d4150",
-    textDisabledColor: "#d9e1e8",
-    dotColor: "white",
-    selectedDotColor: "transparent",
+    textDisabledColor: Colors.primaryGrey, //last and next month color
+    dotColor: "white", // other days, if there are any items
+    selectedDotColor: "white", // today, if there are any items
     arrowColor: "orange",
-    disabledArrowColor: "#d9e1e8",
-    monthTextColor: "blue",
-    indicatorColor: "blue",
-    textDayFontFamily: "monospace",
-    textMonthFontFamily: "monospace",
-    textDayHeaderFontFamily: "monospace",
+    disabledArrowColor: Colors.primaryGrey,
+    monthTextColor: Colors.primaryBold,
+    indicatorColor: Colors.primaryGrey,
+    textDayFontFamily: "robotomono-regular",
+    textMonthFontFamily: "robotomono-bold",
+    textDayHeaderFontFamily: "robotomono-regular",
     textDayFontWeight: "300",
     textMonthFontWeight: "bold",
     textDayHeaderFontWeight: "300",
-    textDayFontSize: 16,
-    textMonthFontSize: 16,
-    textDayHeaderFontSize: 16,
+    textDayFontSize: 14,
+    textMonthFontSize: 14,
+    textDayHeaderFontSize: 14,
+    reservationsBackgroundColor: Colors.primaryBackgroundLight,
+    agendaKnobColor: Colors.primaryGrey,
   };
 
   // Specify how each date should be rendered. day can be undefined if the item is not first in that day
@@ -43,62 +40,31 @@ function WeeklyAgenda() {
 
   //returns card for empty slots.
   const renderEmptyItem = () => {
-    return <Text>No slots in the calendar</Text>;
-  };
-
-  // Specify how each item should be rendered in the agenda
-  const renderItems = (item, firstItemInDay) => {
-    // TODO: Add Habits Scrollable List
     return (
-      <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>
-        <Text>{item.name}</Text>
+      <View style={styles.container}>
+        <Text>No slots in the calendar</Text>
       </View>
     );
   };
 
+  // Specify how each item should be rendered in the agenda
+  const renderItems = (item, firstItemInDay) => {
+    return <HabitItem habit={item} />;
+  };
+
+  const deviceHeight = Dimensions.get("window").height;
+
   return (
     <SafeAreaView>
       <View
-        style={{ height: 200, backgroundColor: Colors.primaryBackgroundLight }}>
+        style={{
+          height: deviceHeight / 1.5,
+          backgroundColor: Colors.primaryBackgroundLight,
+        }}>
         <Agenda
           firstDay={1}
           items={{
-            "2024-09-05": [
-              {
-                name: "Meeting 1",
-                data: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. ",
-              },
-            ],
-            "2024-09-04": [
-              {
-                name: "Meeting 2",
-                data: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. ",
-              },
-            ],
-            "2024-09-05": [
-              {
-                name: "Meeting 3",
-                data: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. ",
-              },
-            ],
-            "2024-03-30": [
-              {
-                name: "Meeting 4",
-                data: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. ",
-              },
-            ],
-            "2024-03-31": [
-              {
-                name: "Meeting 5",
-                data: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. ",
-              },
-            ],
-            "2024-03-25": [
-              {
-                name: "Meeting 6",
-                data: "Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. ",
-              },
-            ],
+            "2024-09-16": habits,
           }}
           renderDay={renderEmptyDay}
           renderEmptyData={renderEmptyItem}

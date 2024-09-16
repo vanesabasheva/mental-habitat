@@ -15,7 +15,7 @@ function NewAlcoholHabitForm({ onAddNewHabit }) {
   function addNewHabitHandler() {
     const newErrors = {
       titleError: title.trim() === "" ? "Title required." : null,
-      drinksError: drinksError.trim() === "" ? "Drinks/day required." : null,
+      drinksError: numberOfDrinks.trim() === "" ? "Drinks/day required." : null,
     };
 
     // Set all errors at once
@@ -29,6 +29,7 @@ function NewAlcoholHabitForm({ onAddNewHabit }) {
     const habit = {
       title: title,
       numberOfDrinks: numberOfDrinks,
+      category: "Alcohol",
     };
     onAddNewHabit(habit);
   }

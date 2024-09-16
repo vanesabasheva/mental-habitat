@@ -1,11 +1,9 @@
 import { FlatList } from "react-native";
 import HabitItem from "./HabitItem";
 
-function HabitsList() {
-  const habits = [{ id: 1 }, { id: 2 }, { id: 3 }];
-
+function HabitsList({ habits }) {
   function renderHabitItem(itemData) {
-    return <HabitItem />;
+    return <HabitItem habit={itemData.item} />;
   }
 
   return (

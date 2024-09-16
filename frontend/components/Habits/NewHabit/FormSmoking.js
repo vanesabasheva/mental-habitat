@@ -29,6 +29,7 @@ function NewSmokingHabitForm({ onAddNewHabit }) {
     const habit = {
       title: title,
       numberOfCigarettes: numberOfCigarettes,
+      category: "Smoking",
     };
     onAddNewHabit(habit);
   }

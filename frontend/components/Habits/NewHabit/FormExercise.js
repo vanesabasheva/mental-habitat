@@ -23,7 +23,7 @@ const SPORT_ACTIVITIES = [
 function NewExerciseHabitForm({ onAddNewHabit }) {
   const [selectedActivity, setSelectedActivity] = useState("Select Activity");
   const [duration, setDuration] = useState("0");
-  const [distance, setDistance] = useState("0");
+  const [distance, setDistance] = useState();
   const [selectedDays, setSelectedDays] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -40,7 +40,7 @@ function NewExerciseHabitForm({ onAddNewHabit }) {
   }
 
   function addNewHabitHandler() {
-    let errorWithDistance;
+    let errorWithDistance = null;
     if (
       selectedActivity === "Running" ||
       selectedActivity === "Cycling" ||
@@ -68,10 +68,11 @@ function NewExerciseHabitForm({ onAddNewHabit }) {
     }
 
     const habit = {
-      activity: selectedActivity,
+      title: selectedActivity,
       duration: duration,
       distance: distance,
       selectedDaysOfWeek: selectedDays,
+      category: "Exercise",
     };
     onAddNewHabit(habit);
   }

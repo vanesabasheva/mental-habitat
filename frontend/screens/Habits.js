@@ -27,13 +27,38 @@ import NewDietHabitForm from "../components/Habits/NewHabit/FormDiet";
 
 const deviceWidth = Dimensions.get("window").width;
 const deviceHeight = Dimensions.get("window").height;
+export const HABITS = [
+  {
+    id: 1,
+    title: "Some Long Title",
+    category: "Smoking",
+    numberOfCigarettes: 1,
+  },
+  {
+    id: 2,
+    title: "Running",
+    category: "Exercise",
+    duration: "20",
+    distance: "2",
+    selectedDaysOfWeek: ["MO", "TU"],
+  },
+  {
+    id: 3,
+    title: "Yoga",
+    category: "Exercise",
+    duration: "35",
+    selectedDaysOfWeek: ["WE"],
+  },
+];
 
 function HabitsScreen() {
   const [selectedDate, setSelectedDate] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
   function saveHabit(habitObject) {
-    console.log(habitObject);
+    habitObject = { ...habitObject, id: Date.now() };
+    HABITS.push(habitObject);
+
     setModalVisible(false);
   }
 
@@ -41,8 +66,6 @@ function HabitsScreen() {
     <NewSmokingHabitForm onAddNewHabit={saveHabit} />
   );
   function pickCategoryHandler(category) {
-    console.log(category);
-
     switch (category) {
       case "Smoking":
         setCurrentForm(<NewSmokingHabitForm onAddNewHabit={saveHabit} />);
@@ -59,7 +82,6 @@ function HabitsScreen() {
       default:
         break;
     }
-    //setCurrentForm(<NewSmokingHabitForm  />);
   }
 
   return (
@@ -121,10 +143,10 @@ function HabitsScreen() {
           </Modal>
         </View>
 
-        <WeeklyAgenda />
+        <WeeklyAgenda habits={HABITS} />
 
         {/* <MonthlyCalendar /> */}
-        <HabitsList />
+        {/* <HabitsList habits={HABITS} /> */}
       </SafeAreaView>
     </>
   );
