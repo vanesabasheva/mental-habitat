@@ -19,7 +19,8 @@ import ProgressBar from "../ui/ProgressBar";
 import { useAssets } from "expo-asset";
 
 const imageSrc = require("../assets/imgs/level1.png");
-
+const screenWidth = Dimensions.get("window").width;
+const screenHeight = Dimensions.get("window").height;
 function HomeScreen() {
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
@@ -37,20 +38,9 @@ function HomeScreen() {
     //console.log(fetchedMessage);
   }, []);
 
-  function openStoryHandler() {
-    console.log("Planet clicked");
-    setModalVisible(true);
-  }
-
   return (
     <>
       <View style={styles.container}>
-        <LinearGradient
-          // Background Linear Gradient
-          colors={[Colors.primaryBackgroundLight, "white"]}
-          style={styles.background}
-        />
-
         <Modal
           animationType="slide"
           transparent={true}
@@ -114,7 +104,12 @@ function HomeScreen() {
           <GreyPlanet width={150} height={150} />
         </View>
 
-        <View style={{ flexDirection: "row", alignSelf: "center" }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignSelf: "baseline",
+            marginHorizontal: screenWidth * 0.03,
+          }}>
           <Pressable
             android_ripple={{ radius: 2, color: Colors.primaryGrey }}
             onPress={() => setModalVisible(true)}
@@ -126,13 +121,14 @@ function HomeScreen() {
             ]}>
             <PlanetLevel1 width={200} height={200} />
           </Pressable>
-          <Text>The engines will be placed here</Text>
+
+          {/* {Engines} */}
           <View
             style={{
               transform: [{ rotate: "220deg" }],
               position: "absolute",
-              left: 200,
-              bottom: 160,
+              left: screenWidth * 0.5,
+              bottom: screenHeight * 0.18,
             }}>
             <ProgressBar
               percentage={20}
@@ -140,6 +136,19 @@ function HomeScreen() {
               incompletedColor={Colors.primaryGrey}
             />
           </View>
+        </View>
+
+        <View style={styles.messageContainer}>
+          <LinearGradient
+            // Background Linear Gradient
+            colors={["white", Colors.primaryBackgroundLight]}
+            style={styles.background}
+          />
+
+          <Text style={{ fontFamily: "robotomono-regular", fontSize: 12 }}>
+            You've landed on the KP403, a place of peace and quiet. Click on the
+            planet to reveal its secrets!
+          </Text>
         </View>
       </View>
     </>
@@ -149,17 +158,10 @@ function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //justifyContent: "",
     alignItems: "center",
     paddingTop: 70,
-    gap: 100,
-  },
-  background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    height: Dimensions.get("window").height,
+    gap: screenHeight * 0.04,
+    backgroundColor: Colors.primaryBackgroundLight,
   },
   welcomeMessage: {
     fontFamily: "robotomono-bold",
@@ -174,11 +176,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-around",
     alignItems: "center",
-    //marginTop: 22,
   },
   modalView: {
-    height: Dimensions.get("window").height / 1.5,
-    width: Dimensions.get("window").width,
+    height: screenHeight * 0.7,
+    width: screenWidth,
     margin: 0,
     backgroundColor: "white",
     borderRadius: 20,
@@ -204,6 +205,25 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 24,
     fontFamily: "robotomono-bold",
+  },
+  background: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+  },
+  messageContainer: {
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    height: 50,
+    backgroundColor: Colors.primaryBackgroundLight,
+    marginHorizontal: screenWidth * 0.05,
+    height: screenHeight * 0.15,
+    paddingTop: screenWidth * 0.07,
+    paddingHorizontal: screenWidth * 0.05,
   },
 });
 

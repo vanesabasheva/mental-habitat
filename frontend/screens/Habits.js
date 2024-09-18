@@ -12,10 +12,8 @@ import { Colors } from "../constants/Colors";
 import Button from "../ui/Button";
 
 import { useState } from "react";
-import WeeklyAgenda from "../components/Calendar/WeeklyCalendar";
-import MonthlyCalendar from "../components/Calendar/MonthlyCalendar";
-import HabitsList from "../components/Habits/HabitsList";
 import { Ionicons } from "@expo/vector-icons";
+import WeeklyAgenda from "../components/Calendar/WeeklyCalendar";
 import NewGoalIcon from "../assets/svgs/NewGoalIcon.svg";
 import BackgroundStars from "../assets/svgs/BackgroundStarsSmall.svg";
 import Sky from "../assets/svgs/Sky.svg";
@@ -144,9 +142,6 @@ function HabitsScreen() {
         </View>
 
         <WeeklyAgenda habits={HABITS} />
-
-        {/* <MonthlyCalendar /> */}
-        {/* <HabitsList habits={HABITS} /> */}
       </SafeAreaView>
     </>
   );
@@ -155,8 +150,6 @@ function HabitsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "space-between",
-    //alignItems: "center",
     backgroundColor: Colors.primaryBackgroundLight,
   },
   header: {

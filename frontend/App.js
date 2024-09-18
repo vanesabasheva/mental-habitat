@@ -10,7 +10,7 @@ import SignInScreen from "./screens/SignIn";
 import SignUpScreen from "./screens/SignUp";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView } from "react-native";
 import IconButton from "./ui/ButtonIcon";
 import BottomTab from "./components/Navigation/BottomTab";
 import DrawerNav from "./components/Navigation/Drawer";
@@ -80,7 +80,10 @@ export default function App() {
     <>
       <StatusBar />
       <AuthContextProvider>
-        <Navigation />
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: Colors.primaryBackgroundLight }}>
+          <Navigation />
+        </SafeAreaView>
       </AuthContextProvider>
     </>
   );

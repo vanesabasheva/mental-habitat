@@ -42,7 +42,7 @@ function WeeklyAgenda({ habits }) {
   const renderEmptyItem = () => {
     return (
       <View style={styles.container}>
-        <Text>No slots in the calendar</Text>
+        <Text>No habits for today</Text>
       </View>
     );
   };
@@ -84,19 +84,9 @@ function WeeklyAgenda({ habits }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-  },
-  item: {
-    //backgroundColor: "white",
-    //flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17,
-  },
-  itemText: {
-    color: "#888",
-    fontSize: 16,
+    //justifyContent: "center",
+    alignItems: "center",
+    marginTop: 12,
   },
 });
 export default WeeklyAgenda;

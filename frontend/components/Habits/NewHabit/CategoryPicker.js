@@ -1,16 +1,13 @@
 import { View, StyleSheet, Dimensions, Text } from "react-native";
-import Button from "../../../ui/Button";
-import { useState } from "react";
 import { Colors } from "../../../constants/Colors";
+import Button from "../../../ui/Button";
 
 const CATEGORIES = ["Smoking", "Exercise", "Alcohol", "Diet"];
 
 function CategoryPicker({ onPickedCategory }) {
   function selectCategoryHandler(index) {
     const newSelectedCategory = CATEGORIES[index];
-
     onPickedCategory(newSelectedCategory);
-    //console.log(CATEGORIES[index]);
   }
   return (
     <View style={styles.conainer}>
