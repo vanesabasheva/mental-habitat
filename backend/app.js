@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const { connect } = require("./util/database");
 const userRoutes = require("./routes/users");
+const habitsRoutes = require("./routes/habits");
 const mongoose = require("mongoose");
 const uri = process.env.MONGO_URI.replace(
   "${MONGO_PASSWORD}",
@@ -15,18 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 const port = 3000;
 
 app.use("/users", userRoutes); //Mount user routes at /users
-
-// const conn = mongoose
-//   .connect(uri, {
-//     serverApi: ServerApiVersion.v1,
-//     autoIndex: true,
-//   })
-//   .then((result) => {
-//     console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
-//     app.listen(port, () => {
-//       console.log(`Server running at http://localhost:${port}`);
-//     });
-//   });
+app.use("/habits", habitsRoutes);
 
 async function startServer() {
   try {

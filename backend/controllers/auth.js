@@ -1,38 +1,15 @@
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
-exports.getLogin = (req, res, next) => {
-  res.render("auth/login", {
-    path: "/login",
-    pageTitle: "Login",
-    isAuthenticated: false,
-  });
-};
-
-exports.getSignup = (req, res, next) => {
-  res.render("auth/signup", {
-    path: "/signup",
-    pageTitle: "Signup",
-    isAuthenticated: false,
-  });
-};
-
-exports.postLogin = (req, res, next) => {
-  User.findById("5bab316ce0a7c75f783cb8a8")
-    .then((user) => {
-      req.session.isLoggedIn = true;
-      req.session.user = user;
-      req.session.save((err) => {
-        console.log(err);
-        res.redirect("/");
-      });
-    })
-    .catch((err) => console.log(err));
-};
-
-exports.postSignup = async (req, res, next) => {
+exports.postRegister = async (req, res) => {
   try {
     console.log(req.body);
     const { email, firstName, password } = req.body;
+    if (!email || !firstName || !password) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
 
     const newUser = new User({
       email: email,
@@ -42,10 +19,45 @@ exports.postSignup = async (req, res, next) => {
     });
 
     const savedUser = await newUser.save();
+    console.log(savedUser);
     res.status(201).json({ message: "User registered" });
   } catch (e) {
-    console.log(e);
-    res.status(500).json({ error: "Server error!" });
+    if (e.code === 11000) {
+      res.status(400).json({
+        error:
+          "Email already used with another account. Please use a different email",
+      });
+    } else {
+      console.log(e);
+      res.status(500).json({ error: "Server error!" });
+    }
+  }
+};
+
+exports.postLogin = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  try {
+    if (!user) {
+      return res
+        .status(401)
+        .json({ error: "User does not exist. Please sign up." });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res
+        .status(401)
+        .json({ error: "Authentication failed. Wrong Password." });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "90d",
+    });
+
+    res.json({ accessToken: token });
+  } catch (error) {
+    res.status(500).json({ error: "Login failed" });
   }
 };
 

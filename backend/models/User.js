@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const { Schema, model } = mongoose;
+const Habit = require("./Habit");
 
 const saltRounds = 10;
 
@@ -10,10 +11,8 @@ const userSchema = new Schema(
     firstName: { type: String, required: true },
     password: { type: String, required: true },
     hasCompletedSurvey: Boolean,
-    habits: [{ habitId: { type: Schema.Types.ObjectId, ref: "Habit" } }],
-    questionAnswers: [
-      { answerId: { type: Schema.Types.ObjectId, ref: "Questionnaire" } },
-    ],
+    habits: [{ type: Schema.Types.ObjectId, ref: "Habit" }],
+    questionAnswers: [{ type: Schema.Types.ObjectId, ref: "Questionnaire" }],
   },
   { collection: "User" }
 );
