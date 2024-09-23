@@ -10,9 +10,11 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     password: { type: String, required: true },
-    hasCompletedSurvey: Boolean,
+    hasCompletedSurvey: { type: Boolean, default: false },
     habits: [{ type: Schema.Types.ObjectId, ref: "Habit" }],
     questionAnswers: [{ type: Schema.Types.ObjectId, ref: "Questionnaire" }],
+    currentLevel: { type: Number, default: 1 },
+    levelProgress: { type: Number, default: 0 },
   },
   { collection: "User" }
 );

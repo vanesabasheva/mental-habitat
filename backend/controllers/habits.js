@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const Habit = require("../models/Habit");
+const WEEK_DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
 exports.getHabits = async (req, res) => {
   const userId = req.user.userId; // Extracted from decoded JWT
 
@@ -15,6 +17,33 @@ exports.getHabits = async (req, res) => {
   }
 };
 
+exports.getHabitsByDate = async (req, res) => {
+  const date = req.params.date;
+  const dateObject = new Date(date);
+  console.log("Date from path param: " + date);
+  console.log("Date object: " + dateObject);
+
+  try {
+    const index = dateObject.getDay();
+    console.log("Index of day " + index);
+    const dayOfWeek = WEEK_DAYS[index];
+    console.log(dayOfWeek);
+
+    // Using $in to find documents where the dayOfWeek is in the selectedDaysOfWeek array
+    const habits = await Habit.find({
+      selectedDaysOfWeek: { $in: [dayOfWeek] },
+      userId: req.user.userId,
+    });
+    console.log(habits);
+    res.json({ habits });
+  } catch (error) {
+    console.error("Error retrieving habits:", error);
+    res
+      .status(500)
+      .json({ error: "Error fetching user habits for specified date" });
+  }
+};
+
 exports.postHabit = async (req, res) => {
   const habit = req.body;
   console.log("in /POST habits: " + JSON.stringify(habit));
@@ -27,32 +56,35 @@ exports.postHabit = async (req, res) => {
     let detailData;
     switch (category) {
       case "Smoking":
-        detailData = { numberOfCigarettes: habit.numberOfCigarettes };
+        detailData = {
+          numberOfCigarettes: habit.numberOfCigarettes,
+        };
         break;
       case "Alcohol":
-        detailData = { numberOfDrinks: habit.numberOfDrinks };
+        detailData = {
+          numberOfDrinks: habit.numberOfDrinks,
+        };
         break;
       case "Exercise":
         detailData = {
-          selectedDaysOfWeek: habit.selectedDaysOfWeek,
           duration: habit.duration,
           distance: habit.distance,
         };
         break;
       case "Diet":
         detailData = {
-          selectedDaysOfWeek: habit.selectedDaysOfWeek,
           habitType: habit.habitType,
         };
     }
     const newHabit = new Habit({
       title,
       category,
+      selectedDaysOfWeek: habit.selectedDaysOfWeek
+        ? habit.selectedDaysOfWeek
+        : WEEK_DAYS,
       details: detailData,
       userId,
     });
-
-    console.log(newHabit);
     await newHabit.save();
 
     // Now, update the User document to include this new habit's ID in the 'habits' array

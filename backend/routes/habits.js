@@ -9,4 +9,6 @@ router.get("/", habitsController.getHabits);
 
 router.post("/", habitsController.postHabit);
 
+router.get("/:date", habitsController.getHabitsByDate);
+
 module.exports = router;

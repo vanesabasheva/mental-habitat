@@ -15,7 +15,6 @@ exports.postRegister = async (req, res) => {
       email: email,
       firstName: firstName,
       password: password,
-      hasCompletedSurvey: false,
     });
 
     const savedUser = await newUser.save();

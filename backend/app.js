@@ -9,8 +9,12 @@ const uri = process.env.MONGO_URI.replace(
   process.env.MONGO_PASSWORD
 );
 const { ServerApiVersion } = require("mongodb");
+const cors = require("cors");
 
 const app = express();
+
+app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const port = 3000;
