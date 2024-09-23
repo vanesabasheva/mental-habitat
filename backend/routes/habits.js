@@ -11,4 +11,6 @@ router.post("/", habitsController.postHabit);
 
 router.get("/:date", habitsController.getHabitsByDate);
 
+router.post("/habitEntry", habitsController.postHabitEntry);
+
 module.exports = router;

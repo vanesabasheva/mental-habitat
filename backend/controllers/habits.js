@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Habit = require("../models/Habit");
+const HabitEntry = require("../models/HabitEntry");
 const WEEK_DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
 exports.getHabits = async (req, res) => {
@@ -46,7 +47,6 @@ exports.getHabitsByDate = async (req, res) => {
 
 exports.postHabit = async (req, res) => {
   const habit = req.body;
-  console.log("in /POST habits: " + JSON.stringify(habit));
 
   const title = habit.title;
   const category = habit.category;
@@ -105,3 +105,68 @@ exports.postHabit = async (req, res) => {
     res.status(500).json({ error: "Failed to create habit" });
   }
 };
+
+exports.postHabitEntry = async (req, res, next) => {
+  try {
+    const { habitId, details } = req.body;
+    const userId = req.user.userId;
+
+    const habit = await Habit.findById(habitId);
+    if (!habit) {
+      return res.status(404).json({ message: "Habit not found" });
+    }
+
+    const newHabitEntry = await HabitEntry.create({
+      habitId: habitId,
+      //details: details ? details : null,
+    });
+
+    const user = await User.findByI(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const statsUpdate = await updateStats(habit.category, user);
+
+    if (statsUpdate.error) {
+      res.status(500).json(statsUpdate);
+    }
+    res.status(201).json({ habitEntry: newHabitEntry, stats: statsUpdate });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Server error. Could not save habit: " + error });
+  }
+};
+
+async function updateStats(category, user) {
+  try {
+    console.log("\nIN UPDATE FUNC: " + JSON.stringify(user));
+    level = user.currentLevel;
+    const multiplier = 5 / level;
+    const increment = Math.ceil(multiplier);
+
+    switch (category) {
+      case "Smoking":
+        user.stats.engines += increment;
+        break;
+      case "Exercise":
+        user.stats.energy += increment;
+        break;
+      case "Alcohol":
+        user.stats.fuel += increment;
+        break;
+      case "Diet":
+        user.stats.grip += increment;
+        break;
+      default:
+        return { error: "Invalid category" };
+    }
+
+    await user.save();
+    return { message: "User stats updated successfully", user: user.stats };
+  } catch (error) {
+    return { error: "Error updating user stats", details: error.message };
+  }
+}

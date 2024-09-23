@@ -15,6 +15,12 @@ const userSchema = new Schema(
     questionAnswers: [{ type: Schema.Types.ObjectId, ref: "Questionnaire" }],
     currentLevel: { type: Number, default: 1 },
     levelProgress: { type: Number, default: 0 },
+    stats: {
+      engines: { type: Number, default: 0 },
+      energy: { type: Number, default: 0 },
+      grip: { type: Number, default: 0 },
+      fuel: { type: Number, default: 0 },
+    },
   },
   { collection: "User" }
 );
