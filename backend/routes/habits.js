@@ -13,4 +13,6 @@ router.get("/:date", habitsController.getHabitsByDate);
 
 router.post("/habitEntry", habitsController.postHabitEntry);
 
+router.delete("/habitEntry", habitsController.deleteHabitEntry);
+
 module.exports = router;

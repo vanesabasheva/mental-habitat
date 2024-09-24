@@ -140,6 +140,22 @@ exports.postHabitEntry = async (req, res, next) => {
   }
 };
 
+exports.deleteHabitEntry = async (req, res, next) => {
+  try {
+    const { habitEntryId } = req.body;
+    console.log(habitEntryId);
+
+    const result = await HabitEntry.findByIdAndDelete(habitEntryId);
+    res
+      .status(204)
+      .json({ message: "Habit Entry deleted successfully", result: result });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Server error. Could not delete habit" + error });
+  }
+};
+
 async function updateStats(category, user) {
   try {
     console.log("\nIN UPDATE FUNC: " + JSON.stringify(user));
