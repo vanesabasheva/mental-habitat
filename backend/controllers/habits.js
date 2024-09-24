@@ -127,7 +127,7 @@ exports.postHabitEntry = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const statsUpdate = await updateStats(habit.category, user);
+    const statsUpdate = await updateStats(habit.category, user, true);
 
     if (statsUpdate.error) {
       res.status(500).json(statsUpdate);
@@ -143,12 +143,25 @@ exports.postHabitEntry = async (req, res, next) => {
 exports.deleteHabitEntry = async (req, res, next) => {
   try {
     const { habitEntryId } = req.body;
-    console.log(habitEntryId);
+    const userId = req.user.userId;
+    console.log("HabitEntry:" + habitEntryId);
+    console.log(userId);
+
+    const habitLogWithUser = await HabitEntry.findById(habitEntryId).populate(
+      "habitId"
+    );
+
+    const user = await User.findById(habitLogWithUser.habitId.userId);
+
+    console.log(habitLogWithUser);
+    const statsUpdate = await updateStats(
+      habitLogWithUser.habitId.category,
+      user,
+      false
+    );
 
     const result = await HabitEntry.findByIdAndDelete(habitEntryId);
-    res
-      .status(204)
-      .json({ message: "Habit Entry deleted successfully", result: result });
+    res.status(204).send();
   } catch (error) {
     res
       .status(500)
@@ -156,25 +169,32 @@ exports.deleteHabitEntry = async (req, res, next) => {
   }
 };
 
-async function updateStats(category, user) {
+async function updateStats(category, user, isIncrementing) {
   try {
-    console.log("\nIN UPDATE FUNC: " + JSON.stringify(user));
     level = user.currentLevel;
     const multiplier = 5 / level;
     const increment = Math.ceil(multiplier);
 
     switch (category) {
       case "Smoking":
-        user.stats.engines += increment;
+        user.stats.engines = isIncrementing
+          ? user.stats.engines + increment
+          : user.stats.engines - increment;
         break;
       case "Exercise":
-        user.stats.energy += increment;
+        user.stats.energy = isIncrementing
+          ? user.stats.energy + increment
+          : user.stats.energy - increment;
         break;
       case "Alcohol":
-        user.stats.fuel += increment;
+        user.stats.fuel = isIncrementing
+          ? user.stats.fuel + increment
+          : user.stats.fuel - increment;
         break;
       case "Diet":
-        user.stats.grip += increment;
+        user.stats.grip = isIncrementing
+          ? user.stats.grip + increment
+          : user.stats.grip - increment;
         break;
       default:
         return { error: "Invalid category" };
