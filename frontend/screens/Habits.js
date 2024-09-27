@@ -30,7 +30,7 @@ export const HABITS = [
     id: 1,
     title: "Some Long Title",
     category: "Smoking",
-    numberOfCigarettes: 1,
+    numberOfCigarettes: "1",
   },
   {
     id: 2,
@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+    fontFamily: "robotomono-regular",
   },
   modalText: {
     marginBottom: 10,

@@ -1,7 +1,25 @@
-import { Modal, View, Text, StyleSheet } from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Pressable,
+  ImageBackground,
+  ScrollView,
+} from "react-native";
 import { useAssets } from "expo-asset";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { deviceHeight, deviceWidth } from "../constants/Dimensions";
 
-function CustomModal({ children, imageSrc, title, description }) {
+function CustomModal({
+  children,
+  imageSrc,
+  title,
+  description,
+  modalVisible,
+  setModalVisible,
+}) {
   const [assets, error] = useAssets([require("../assets/imgs/level1.png")]);
   return (
     <Modal
@@ -12,35 +30,40 @@ function CustomModal({ children, imageSrc, title, description }) {
         Alert.alert("Modal has been closed.");
         setModalVisible(!modalVisible);
       }}>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          {assets ? (
-            <ImageBackground
-              source={assets[0]}
+      <ScrollView
+        style={{ marginTop: deviceHeight / 6 }}
+        automaticallyAdjustKeyboardInsets={true}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            {/* {assets ? (
+              <ImageBackground
+                source={assets[0]}
+                style={{
+                  flex: 1,
+                  resizeMode: "cover",
+                  justifyContent: "center",
+                }}
+              />
+            ) : null} */}
+            <Pressable
+              style={({ pressed }) => (pressed ? [{ opacity: 0.7 }] : null)}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Ionicons name="remove" size={32} color="black" />
+            </Pressable>
+            <Text style={styles.modalText}>{title}</Text>
+            <Text
               style={{
-                flex: 1,
-                resizeMode: "cover",
-                justifyContent: "center",
-              }}
-            />
-          ) : null}
-          <Pressable
-            style={({ pressed }) => (pressed ? [{ opacity: 0.7 }] : null)}
-            onPress={() => setModalVisible(!modalVisible)}>
-            <Ionicons name="remove" size={32} color="black" />
-          </Pressable>
-          <Text style={styles.modalText}>{title}</Text>
-          <Text
-            style={{
-              fontSize: 18,
-              fontFamily: "robotomono-bold",
-              marginBottom: 10,
-            }}>
-            {description}
-          </Text>
-          {children}
+                fontSize: 18,
+                fontFamily: "robotomono-bold",
+                marginBottom: 10,
+                textAlign: "center",
+              }}>
+              {description}
+            </Text>
+            {children}
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 }
@@ -53,8 +76,8 @@ const styles = StyleSheet.create({
     //marginTop: 22,
   },
   modalView: {
-    height: Dimensions.get("window").height / 1.5,
-    width: Dimensions.get("window").width,
+    height: deviceHeight / 1.5,
+    width: deviceWidth,
     margin: 0,
     backgroundColor: "white",
     borderRadius: 20,
@@ -74,12 +97,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-  },
-  buttonOpen: {
-    backgroundColor: "#F194FF",
-  },
-  buttonClose: {
-    backgroundColor: "#2196F3",
   },
   modalText: {
     marginBottom: 15,

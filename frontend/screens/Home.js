@@ -15,8 +15,11 @@ import { Colors } from "../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import PlanetLevel1 from "../assets/svgs/PlanetLevel1.svg";
 import GreyPlanet from "../assets/svgs/GreyPlanet.svg";
+import ProgressStarsBackground from "../assets/svgs/ProgressStarsBackground.svg";
 import ProgressBar from "../ui/ProgressBar";
 import { useAssets } from "expo-asset";
+import ShipProgress from "../ui/ShipProgress";
+import Button from "../ui/Button";
 
 const imageSrc = require("../assets/imgs/level1.png");
 const screenWidth = Dimensions.get("window").width;
@@ -110,6 +113,14 @@ function HomeScreen() {
             alignSelf: "baseline",
             marginHorizontal: screenWidth * 0.03,
           }}>
+          <View
+            style={{
+              position: "absolute",
+              left: screenWidth * 0.2,
+              bottom: screenHeight * 0.1,
+            }}>
+            <ProgressStarsBackground />
+          </View>
           <Pressable
             android_ripple={{ radius: 2, color: Colors.primaryGrey }}
             onPress={() => setModalVisible(true)}
@@ -134,8 +145,20 @@ function HomeScreen() {
               percentage={20}
               completedColor={Colors.primaryBold}
               incompletedColor={Colors.primaryGrey}
+              stepStyle={{ transform: [{ rotate: "90deg" }] }}
+              gap={15}
             />
           </View>
+        </View>
+
+        <View
+          style={{
+            // transform: [{ rotate: "90deg" }],
+            position: "absolute",
+            left: screenWidth * 0.55,
+            bottom: screenHeight * 0.25,
+          }}>
+          <ShipProgress></ShipProgress>
         </View>
 
         <View style={styles.messageContainer}>

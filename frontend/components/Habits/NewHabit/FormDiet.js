@@ -5,14 +5,23 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Colors } from "../../../constants/Colors";
 import { styles } from "./FormExercise";
 import SelectWeekDays, { WEEK_DAYS } from "./SelectWeekDays";
 import Button from "../../../ui/Button";
 import Ionicons from "@expo/vector-icons/Ionicons";
+const dayIndices = {
+  MO: 0,
+  TU: 1,
+  WE: 2,
+  TH: 3,
+  FR: 4,
+  SA: 5,
+  SU: 6,
+};
 
-function NewDietHabitForm({ onAddNewHabit }) {
+function NewDietHabitForm({ habit, onAddNewHabit, buttonLabel }) {
   const [title, setTitle] = useState("");
   const [habitType, setHabitType] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
@@ -22,6 +31,15 @@ function NewDietHabitForm({ onAddNewHabit }) {
     typeHabitError: null,
     daysError: null,
   });
+
+  useEffect(() => {
+    if (habit) {
+      const indices = habit.selectedDaysOfWeek.map((day) => dayIndices[day]);
+      setTitle(habit.title);
+      setHabitType(habit.habitType);
+      setSelectedDays(indices);
+    }
+  }, [habit]);
 
   function selectedDaysHandler(days) {
     const selectedDayNames = days.map((index) => WEEK_DAYS[index]);
@@ -128,7 +146,7 @@ function NewDietHabitForm({ onAddNewHabit }) {
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>
-        Add
+        {buttonLabel ? buttonLabel : "Add"}
       </Button>
     </View>
   );

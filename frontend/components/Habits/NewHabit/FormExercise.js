@@ -6,7 +6,7 @@ import {
   Dimensions,
   Modal,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Colors } from "../../../constants/Colors";
 import { Picker } from "@react-native-picker/picker";
 import Button from "../../../ui/Button";
@@ -20,7 +20,7 @@ const SPORT_ACTIVITIES = [
   "Weight Training",
   "Yoga",
 ];
-function NewExerciseHabitForm({ onAddNewHabit }) {
+function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
   const [selectedActivity, setSelectedActivity] = useState("Select Activity");
   const [duration, setDuration] = useState("0");
   const [distance, setDistance] = useState();
@@ -38,6 +38,14 @@ function NewExerciseHabitForm({ onAddNewHabit }) {
     const selectedDayNames = days.map((index) => WEEK_DAYS[index]);
     setSelectedDays(selectedDayNames);
   }
+
+  useEffect(() => {
+    if (habit) {
+      setSelectedActivity(habit.title);
+      setDuration(habit.duration);
+      habit.distance ? setDistance(habit.distance) : "";
+    }
+  }, [habit]);
 
   function addNewHabitHandler() {
     let errorWithDistance = null;
@@ -171,7 +179,7 @@ function NewExerciseHabitForm({ onAddNewHabit }) {
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>
-        Add
+        {buttonLabel ? buttonLabel : "Add"}
       </Button>
     </View>
   );

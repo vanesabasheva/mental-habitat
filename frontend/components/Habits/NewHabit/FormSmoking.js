@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextInput, View, Text, StyleSheet, Dimensions } from "react-native";
 import { Colors } from "../../../constants/Colors";
 import Button from "../../../ui/Button";
 
-function NewSmokingHabitForm({ onAddNewHabit }) {
+function NewSmokingHabitForm({ habit, buttonLabel, onAddNewHabit }) {
   const [title, setTitle] = useState("");
   const [numberOfCigarettes, setNumberOfCigarettes] = useState("");
   const [errors, setErrors] = useState({
     titleError: null,
     cigaretteError: null,
   });
+
+  useEffect(() => {
+    if (habit) {
+      setTitle(habit.title);
+      console.log(JSON.stringify(habit));
+      setNumberOfCigarettes(habit.numberOfCigarettes);
+    }
+  }, [habit]);
 
   function addNewHabitHandler() {
     const newErrors = {
@@ -87,7 +95,7 @@ function NewSmokingHabitForm({ onAddNewHabit }) {
           width: Dimensions.get("window").width / 1.3,
         }}
         onPress={addNewHabitHandler}>
-        Add
+        {buttonLabel ? buttonLabel : "Add"}
       </Button>
     </View>
   );
