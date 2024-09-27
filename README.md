@@ -1,6 +1,9 @@
 Habit-tracking application aimed at preventing non-communicable diseases (NCDs) as part of my Software & Information Engineering bachelor thesis. The application leverages React Native for cross-platform mobile development, Node.js with Express, and MongoDB for scalable data management. Focused on promoting healthier lifestyles through personalized goal setting, real-time progress tracking, and gamified user experiences.
 
+
 ![mental_habitat_header](https://github.com/user-attachments/assets/71c382ee-d91e-46b6-ae64-103b3721549e)
+
+
 Figma Prototype: https://www.figma.com/proto/ZhuoZPjffDXkTn6Rs7QWiS/MentalHabitat?node-id=9-476&node-type=CANVAS&t=mdtYbLsubuaAGyMP-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=9%3A476
 
 ![image](https://github.com/user-attachments/assets/a7b76d13-159a-4a71-9f37-47cb192baeab)
