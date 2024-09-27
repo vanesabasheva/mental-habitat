@@ -7,5 +7,8 @@ const habitEntrySchema = new Schema({
   details: { type: Schema.Types.Mixed },
 });
 
-const HabitEntry = mongoose.model("HabitEntry", habitEntrySchema);
+// Ensure that there can only be one entry per habit per day
+habitEntrySchema.index({ habitId: 1, date: 1 }, { unique: true });
+
+const HabitEntry = model("HabitEntry", habitEntrySchema);
 module.exports = HabitEntry;

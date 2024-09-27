@@ -106,10 +106,23 @@ exports.postHabit = async (req, res) => {
   }
 };
 
-exports.postHabitEntry = async (req, res, next) => {
+exports.postHabitEntry = async (req, res) => {
   try {
-    const { habitId, details } = req.body;
+    const { habitId } = req.body;
     const userId = req.user.userId;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // reset time to start of the day (one habit entry per day allowed)
+
+    const entry = HabitEntry.findOne({
+      habitId: habitId,
+      day: today,
+    });
+
+    if (entry) {
+      return res
+        .status(400)
+        .json({ message: "Habit already logged for today" });
+    }
 
     const habit = await Habit.findById(habitId);
     if (!habit) {
@@ -118,6 +131,7 @@ exports.postHabitEntry = async (req, res, next) => {
 
     const newHabitEntry = await HabitEntry.create({
       habitId: habitId,
+      day: today,
       //details: details ? details : null,
     });
 
@@ -141,27 +155,27 @@ exports.postHabitEntry = async (req, res, next) => {
 };
 
 exports.deleteHabitEntry = async (req, res, next) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   try {
-    const { habitEntryId } = req.body;
+    const { habitId } = req.body;
+    const result = await HabitEntry.deleteOne({
+      habitId: habitId,
+      day: today,
+    });
+
     const userId = req.user.userId;
-    console.log("HabitEntry:" + habitEntryId);
-    console.log(userId);
+    const user = await User.findById(userId);
 
-    const habitLogWithUser = await HabitEntry.findById(habitEntryId).populate(
-      "habitId"
-    );
+    const habitWithUser = await Habit.findById(habitId);
 
-    const user = await User.findById(habitLogWithUser.habitId.userId);
+    console.log("Habit:" + JSON.stringify(habitWithUser));
+    const statsUpdate = await updateStats(habitWithUser.category, user, false);
 
-    console.log(habitLogWithUser);
-    const statsUpdate = await updateStats(
-      habitLogWithUser.habitId.category,
-      user,
-      false
-    );
-
-    const result = await HabitEntry.findByIdAndDelete(habitEntryId);
-    res.status(204).send();
+    res
+      .status(200)
+      .json({ message: "Habit Log deleted successfully", stats: statsUpdate });
   } catch (error) {
     res
       .status(500)
@@ -174,34 +188,41 @@ async function updateStats(category, user, isIncrementing) {
     level = user.currentLevel;
     const multiplier = 5 / level;
     const increment = Math.ceil(multiplier);
-
+    let updatedStat;
     switch (category) {
       case "Smoking":
         user.stats.engines = isIncrementing
           ? user.stats.engines + increment
           : user.stats.engines - increment;
+        updatedStat = "engines";
         break;
       case "Exercise":
         user.stats.energy = isIncrementing
           ? user.stats.energy + increment
           : user.stats.energy - increment;
+        updatedStat = "energy";
         break;
       case "Alcohol":
         user.stats.fuel = isIncrementing
           ? user.stats.fuel + increment
           : user.stats.fuel - increment;
+        updatedStat = "fuel";
         break;
       case "Diet":
         user.stats.grip = isIncrementing
           ? user.stats.grip + increment
           : user.stats.grip - increment;
+        updatedStat = "grip";
         break;
       default:
         return { error: "Invalid category" };
     }
 
     await user.save();
-    return { message: "User stats updated successfully", user: user.stats };
+    return {
+      updatedStat: updatedStat,
+      increment: increment,
+    };
   } catch (error) {
     return { error: "Error updating user stats", details: error.message };
   }
