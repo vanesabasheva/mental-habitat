@@ -3,6 +3,7 @@ const express = require("express");
 const { connect } = require("./util/database");
 const userRoutes = require("./routes/users");
 const habitsRoutes = require("./routes/habits");
+const gameRoutes = require("./routes/game");
 const mongoose = require("mongoose");
 const uri = process.env.MONGO_URI.replace(
   "${MONGO_PASSWORD}",
@@ -21,6 +22,7 @@ const port = 3000;
 
 app.use("/users", userRoutes); //Mount user routes at /users
 app.use("/habits", habitsRoutes);
+app.use("/game", gameRoutes);
 
 async function startServer() {
   try {
