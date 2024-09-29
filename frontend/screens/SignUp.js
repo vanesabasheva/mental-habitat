@@ -15,16 +15,16 @@ function SignUpScreen({ navigation }) {
   });
   const authCtx = useContext(AuthContext);
 
-  async function authenticateHandler(email, password) {
+  async function authenticateHandler(email, password, fullName) {
     setIsLoading(true);
     try {
-      const token = await signUpUser(email, password);
+      const token = await signUpUser(email, password, fullName);
       authCtx.signIn(token);
-    } catch (e) {
+    } catch (error) {
       //TODO: add error message
       Alert.alert(
         "Signing Up failed!",
-        "Could not sign you in. Please check again later or check credentials. "
+        "Could not sign you up. Please check again later or check credentials. "
       );
       setIsLoading(false);
     }
@@ -34,6 +34,7 @@ function SignUpScreen({ navigation }) {
     let { email, fullName, password } = credentials;
     email = email.trim();
     password = password.trim();
+    fullName = fullName.trim();
 
     const emailIsValid = email.includes("@");
     const passwordIsValid = password.length > 6;
@@ -45,7 +46,7 @@ function SignUpScreen({ navigation }) {
       });
       return;
     }
-    authenticateHandler(email, password);
+    authenticateHandler(email, password, fullName);
   }
 
   function changeSignMode() {

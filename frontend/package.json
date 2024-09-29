@@ -15,6 +15,7 @@
     "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
+    "axios": "^1.7.7",
     "color-convert": "^2.0.1",
     "expo": "~51.0.28",
     "expo-asset": "~10.0.10",

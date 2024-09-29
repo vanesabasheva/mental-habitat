@@ -103,7 +103,7 @@ function HomeScreen() {
           <Text style={styles.description}>to unlock the next planet.</Text>
         </View>
 
-        <View style={{ alignSelf: "flex-end" }}>
+        <View style={{ alignSelf: "flex-end", zIndex: 10 }}>
           <GreyPlanet width={150} height={150} />
         </View>
 

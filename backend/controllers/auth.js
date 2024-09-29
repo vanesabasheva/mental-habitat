@@ -1,25 +1,27 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
 exports.postRegister = async (req, res) => {
   try {
-    console.log(req.body);
-    const { email, firstName, password } = req.body;
-    if (!email || !firstName || !password) {
+    const { email, fullName, password } = req.body;
+    console.log(email + " " + password + " " + fullName);
+    if (!email || !fullName || !password) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
     const newUser = new User({
       email: email,
-      firstName: firstName,
+      fullName: fullName,
       password: password,
     });
 
     const savedUser = await newUser.save();
+
     console.log(savedUser);
-    res.status(201).json({ message: "User registered" });
+    const token = generateToken(savedUser._id);
+
+    res.json({ accessToken: token });
   } catch (e) {
     if (e.code === 11000) {
       res.status(400).json({
@@ -27,8 +29,7 @@ exports.postRegister = async (req, res) => {
           "Email already used with another account. Please use a different email",
       });
     } else {
-      console.log(e);
-      res.status(500).json({ error: "Server error!" });
+      handleError(res, e);
     }
   }
 };
@@ -50,13 +51,10 @@ exports.postLogin = async (req, res) => {
         .json({ error: "Authentication failed. Wrong Password." });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "90d",
-    });
-
+    const token = generateToken(user._id);
     res.json({ accessToken: token });
   } catch (error) {
-    res.status(500).json({ error: "Login failed" });
+    handleError(res, error);
   }
 };
 
@@ -66,3 +64,16 @@ exports.postLogout = (req, res, next) => {
     res.redirect("/");
   });
 };
+
+// helper functions
+
+function generateToken(userId) {
+  return jwt.sign({ userId: userId }, process.env.JWT_SECRET, {
+    expiresIn: "90d",
+  });
+}
+
+function handleError(res, error) {
+  console.error(error);
+  res.status(500).json({ error: "Server error!" });
+}

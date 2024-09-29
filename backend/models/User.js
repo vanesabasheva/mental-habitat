@@ -8,7 +8,7 @@ const saltRounds = 10;
 const userSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
-    firstName: { type: String, required: true },
+    fullName: { type: String, required: true },
     password: { type: String, required: true },
     hasCompletedSurvey: { type: Boolean, default: false },
     habits: [{ type: Schema.Types.ObjectId, ref: "Habit" }],

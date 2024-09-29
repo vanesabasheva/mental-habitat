@@ -11,7 +11,7 @@ import {
 import { Colors } from "../constants/Colors";
 import Button from "../ui/Button";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import WeeklyAgenda from "../components/Calendar/WeeklyCalendar";
 import NewGoalIcon from "../assets/svgs/NewGoalIcon.svg";
@@ -22,47 +22,62 @@ import NewSmokingHabitForm from "../components/Habits/NewHabit/FormSmoking";
 import NewExerciseHabitForm from "../components/Habits/NewHabit/FormExercise";
 import NewAlcoholHabitForm from "../components/Habits/NewHabit/FormAlcohol";
 import NewDietHabitForm from "../components/Habits/NewHabit/FormDiet";
+import { deviceHeight, deviceWidth } from "../constants/Dimensions";
+import axios from "axios";
+import { AuthContext } from "../store/auth-context";
 
-const deviceWidth = Dimensions.get("window").width;
-const deviceHeight = Dimensions.get("window").height;
+const emulatorBaseURL = "http://10.0.2.2:3000/habits";
 export const HABITS = [
   {
-    id: 1,
+    _id: 1,
     title: "Some Long Title",
     category: "Smoking",
-    numberOfCigarettes: "1",
+    details: {
+      numberOfCigarettes: "1",
+    },
   },
   {
-    id: 2,
+    _id: 2,
     title: "Running",
     category: "Exercise",
-    duration: "20",
-    distance: "2",
+    details: {
+      duration: "20",
+      distance: "2",
+    },
     selectedDaysOfWeek: ["MO", "TU"],
   },
   {
-    id: 3,
+    _id: 3,
     title: "Yoga",
     category: "Exercise",
-    duration: "35",
+    details: {
+      duration: "35",
+    },
     selectedDaysOfWeek: ["WE"],
   },
 ];
 
 function HabitsScreen() {
+  const { token } = useContext(AuthContext);
   const [selectedDate, setSelectedDate] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
-  function saveHabit(habitObject) {
-    habitObject = { ...habitObject, id: Date.now() };
-    HABITS.push(habitObject);
-
-    setModalVisible(false);
+  async function saveHabit(habitObject) {
+    try {
+      const response = await axios.post(emulatorBaseURL, habitObject, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      HABITS.push(response.data.habit);
+      setModalVisible(false);
+    } catch (error) {
+      console.log("Error saving habit: " + error);
+    }
   }
 
   const [currentForm, setCurrentForm] = useState(
     <NewSmokingHabitForm onAddNewHabit={saveHabit} />
   );
+
   function pickCategoryHandler(category) {
     switch (category) {
       case "Smoking":

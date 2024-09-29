@@ -29,7 +29,7 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   function submitHandler() {
     onSubmit({
       email: enteredEmail,
-      fullName: setEnteredFullName,
+      fullName: fullName,
       password: enteredPassword,
     });
   }

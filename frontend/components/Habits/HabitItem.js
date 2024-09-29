@@ -16,16 +16,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { deviceWidth } from "../../constants/Dimensions";
 
 function HabitItem({ onLogHabit, onDeleteHabitLog, habit }) {
-  const {
-    title,
-    numberOfCigarettes,
-    duration,
-    distance,
-    numberOfDrinks,
-    habitType,
-    selectedDaysOfWeek,
-    category,
-  } = habit;
+  const { title, details, habitType, selectedDaysOfWeek, category } = habit;
+
+  const { numberOfCigarettes, duration, distance, numberOfDrinks } = details;
 
   const [isHabitChecked, setIsHabitChecked] = useState(false);
 

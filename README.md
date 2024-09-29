@@ -8,7 +8,7 @@ Run `npm start`
 ### Start frontend:
 
 Navigate to \frontend folder of the project
-npm start
+Run `npm start`
 
 Connect with an Android emulator by pressing `a` key on keyboard.
 
