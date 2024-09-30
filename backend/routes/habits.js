@@ -9,6 +9,8 @@ router.get("/", habitsController.getHabits);
 
 router.post("/", habitsController.postHabit);
 
+router.delete("/:habitId", habitsController.deleteHabit);
+
 router.get("/:date", habitsController.getHabitsByDate);
 
 router.post("/habitEntry", habitsController.postHabitEntry);

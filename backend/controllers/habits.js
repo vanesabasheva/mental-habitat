@@ -106,6 +106,28 @@ exports.postHabit = async (req, res) => {
   }
 };
 
+exports.deleteHabit = async (req, res) => {
+  const { habitId } = req.params;
+  const userId = req.user.userId;
+
+  try {
+    const habitToDel = await Habit.findById(habitId);
+
+    const result = await Habit.findByIdAndDelete(habitId);
+
+    const user = await User.findById(userId);
+
+    user.habits = user.habits.filter((habit) => habit.toString() !== habitId);
+
+    await user.save();
+    res.status(204).send();
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Server error. Could not delete habit" + error });
+  }
+};
+
 exports.postHabitEntry = async (req, res) => {
   try {
     const { habitId } = req.body;
@@ -173,13 +195,14 @@ exports.deleteHabitEntry = async (req, res, next) => {
     console.log("Habit:" + JSON.stringify(habitWithUser));
     const statsUpdate = await updateStats(habitWithUser.category, user, false);
 
-    res
-      .status(200)
-      .json({ message: "Habit Log deleted successfully", stats: statsUpdate });
+    res.status(200).json({
+      message: "Habit entry deleted successfully",
+      stats: statsUpdate,
+    });
   } catch (error) {
     res
       .status(500)
-      .json({ error: "Server error. Could not delete habit" + error });
+      .json({ error: "Server error. Could not delete habit entry" + error });
   }
 };
 
