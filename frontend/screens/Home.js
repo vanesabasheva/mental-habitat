@@ -97,10 +97,10 @@ function HomeScreen() {
 
         <View>
           <Text style={styles.welcomeMessage}>
-            Welcome back to your mission, {userFirstName}!
+            Welcome back, {userFirstName}!
           </Text>
-          <Text style={styles.description}>Log actions towards your goals</Text>
-          <Text style={styles.description}>to unlock the next planet.</Text>
+          {/* {Engines} */}
+          <ShipProgress></ShipProgress>
         </View>
 
         <View style={{ alignSelf: "flex-end", zIndex: 10 }}>
@@ -133,7 +133,7 @@ function HomeScreen() {
             <PlanetLevel1 width={200} height={200} />
           </Pressable>
 
-          {/* {Engines} */}
+          {/* {SpaceShip} */}
           <View
             style={{
               transform: [{ rotate: "220deg" }],
@@ -149,16 +149,6 @@ function HomeScreen() {
               gap={15}
             />
           </View>
-        </View>
-
-        <View
-          style={{
-            // transform: [{ rotate: "90deg" }],
-            position: "absolute",
-            left: screenWidth * 0.55,
-            bottom: screenHeight * 0.25,
-          }}>
-          <ShipProgress></ShipProgress>
         </View>
 
         <View style={styles.messageContainer}>
@@ -182,13 +172,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    paddingTop: 70,
-    gap: screenHeight * 0.04,
+    paddingTop: screenHeight * 0.05,
+    gap: screenHeight * 0.02,
     backgroundColor: Colors.primaryBackgroundLight,
   },
   welcomeMessage: {
     fontFamily: "robotomono-bold",
     fontSize: 24,
+    marginBottom: 10,
+    marginHorizontal: 15,
   },
   description: {
     fontFamily: "robotomono-regular",
@@ -239,6 +231,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 32,
   },
   messageContainer: {
+    position: "absolute",
+    bottom: screenHeight * 0.05,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     height: 50,
