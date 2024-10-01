@@ -208,7 +208,7 @@ function HabitItem({ onLogHabit, onDeleteHabitLog, habit }) {
     <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>
       <View style={[styles.container, { backgroundColor: habitCategoryColor }]}>
         <View>{icon}</View>
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: 8, maxWidth: "40%" }}>
           <View>
             <Text style={[styles.title, checkedTextStyle]}>{title}</Text>
             {descriptionBasedOnCategory}

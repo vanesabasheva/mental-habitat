@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     //marginTop: 22,
   },
   modalView: {
-    height: deviceHeight / 1.5,
+    height: deviceHeight / 1.2,
     width: deviceWidth,
     margin: 0,
     backgroundColor: "white",

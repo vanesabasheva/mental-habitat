@@ -6,14 +6,7 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { deviceWidth, deviceHeight } from "../constants/Dimensions";
-function ShipProgress(prop) {
-  const stats = {
-    engines: 10,
-    energy: 10,
-    grip: 5,
-    fuel: 0,
-  };
-
+function ShipProgress({ stats }) {
   const keysArray = Object.keys(stats);
 
   let progress = 0;

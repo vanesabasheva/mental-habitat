@@ -20,8 +20,8 @@ function SignInScreen({ navigation }) {
     try {
       const token = await signInUser(email, password);
       authCtx.signIn(token);
-    } catch (e) {
-      //TODO: add error message
+    } catch (error) {
+      console.log("authenticateHandler, Signing In failed");
       Alert.alert(
         "Signing In failed!",
         "Could not log you in. Please check again later or check credentials. "

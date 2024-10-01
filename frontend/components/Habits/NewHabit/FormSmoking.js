@@ -33,13 +33,13 @@ function NewSmokingHabitForm({ habit, buttonLabel, onAddNewHabit }) {
     if (Object.values(newErrors).some((error) => error !== null)) {
       return;
     }
-
-    const habit = {
+    const newHabit = {
       title: title,
       numberOfCigarettes: numberOfCigarettes,
       category: "Smoking",
     };
-    onAddNewHabit(habit);
+    console.log(newHabit);
+    onAddNewHabit(newHabit);
   }
   return (
     <View style={styles.container}>

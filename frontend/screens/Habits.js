@@ -11,7 +11,7 @@ import {
 import { Colors } from "../constants/Colors";
 import Button from "../ui/Button";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import WeeklyAgenda from "../components/Calendar/WeeklyCalendar";
 import NewGoalIcon from "../assets/svgs/NewGoalIcon.svg";
@@ -27,56 +27,26 @@ import axios from "axios";
 import { AuthContext } from "../store/auth-context";
 
 const emulatorBaseURL = "http://10.0.2.2:3000/habits";
-export const HABITS = [
-  {
-    _id: 1,
-    title: "Some Long Title",
-    category: "Smoking",
-    details: {
-      numberOfCigarettes: "1",
-    },
-  },
-  {
-    _id: 2,
-    title: "Running",
-    category: "Exercise",
-    details: {
-      duration: "20",
-      distance: "2",
-    },
-    selectedDaysOfWeek: ["MO", "TU"],
-  },
-  {
-    _id: 3,
-    title: "Yoga",
-    category: "Exercise",
-    details: {
-      duration: "35",
-    },
-    selectedDaysOfWeek: ["WE"],
-  },
-];
+const backendURL = "http://128.131.195.95:3000/habits";
 
 function HabitsScreen() {
   const { token } = useContext(AuthContext);
   const [selectedDate, setSelectedDate] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [currentForm, setCurrentForm] = useState(
+    <NewSmokingHabitForm onAddNewHabit={saveHabit} />
+  );
 
   async function saveHabit(habitObject) {
     try {
-      const response = await axios.post(emulatorBaseURL, habitObject, {
+      const response = await axios.post(backendURL, habitObject, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      HABITS.push(response.data.habit);
       setModalVisible(false);
     } catch (error) {
       console.log("Error saving habit: " + error);
     }
   }
-
-  const [currentForm, setCurrentForm] = useState(
-    <NewSmokingHabitForm onAddNewHabit={saveHabit} />
-  );
 
   function pickCategoryHandler(category) {
     switch (category) {
@@ -156,7 +126,7 @@ function HabitsScreen() {
           </Modal>
         </View>
 
-        <WeeklyAgenda habits={HABITS} />
+        <WeeklyAgenda />
       </SafeAreaView>
     </>
   );

@@ -12,33 +12,51 @@ import {
 import { AuthContext } from "../store/auth-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "../constants/Colors";
+import { useAssets } from "expo-asset";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import PlanetLevel1 from "../assets/svgs/PlanetLevel1.svg";
 import GreyPlanet from "../assets/svgs/GreyPlanet.svg";
 import ProgressStarsBackground from "../assets/svgs/ProgressStarsBackground.svg";
 import ProgressBar from "../ui/ProgressBar";
-import { useAssets } from "expo-asset";
 import ShipProgress from "../ui/ShipProgress";
-import Button from "../ui/Button";
-
+import axios from "axios";
 const imageSrc = require("../assets/imgs/level1.png");
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
+const backendURL = "http://128.131.195.95:3000/game";
+
 function HomeScreen() {
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
   const userFirstName = "George";
-  const [fetchedMessage, setFetchedMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [fetchedMessage, setFetchedMessage] = useState("");
   const [assets, error] = useAssets([require("../assets/imgs/level1.png")]);
+
+  /////////////////////////////////////////////
+  // Set User Progress and stats (resources) //
+  ////////////////////////////////////////////
+  const [stats, setStats] = useState({});
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [levelProgress, setLevelProgress] = useState(0);
+
   useEffect(() => {
-    // fetch(
-    //   "https://react-native-course-c14bc-default-rtdb.firebaseio.com/messages.json"
-    // )
-    //   .then((response) => response.json())
-    //   .then((data) => setFetchedMessage(data));
-    //console.log(response);
-    //console.log(fetchedMessage);
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get(`${backendURL}/progress`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setStats(response.data.stats);
+        setLevelProgress(response.data.levelProgress);
+        setCurrentLevel(response.data.currentLevel);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
   }, []);
 
   return (
@@ -100,7 +118,7 @@ function HomeScreen() {
             Welcome back, {userFirstName}!
           </Text>
           {/* {Engines} */}
-          <ShipProgress></ShipProgress>
+          <ShipProgress stats={stats}></ShipProgress>
         </View>
 
         <View style={{ alignSelf: "flex-end", zIndex: 10 }}>
@@ -142,7 +160,7 @@ function HomeScreen() {
               bottom: screenHeight * 0.18,
             }}>
             <ProgressBar
-              percentage={20}
+              percentage={levelProgress}
               completedColor={Colors.primaryBold}
               incompletedColor={Colors.primaryGrey}
               stepStyle={{ transform: [{ rotate: "90deg" }] }}

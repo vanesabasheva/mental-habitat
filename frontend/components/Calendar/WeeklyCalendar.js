@@ -4,14 +4,12 @@ import {
   Text,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
-  TextInput,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
 //import { HABITS } from "../../screens/Habits";
 import HabitItem from "../Habits/HabitItem";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import CustomModal from "../../ui/Modal";
 import NewAlcoholHabitForm from "../Habits/NewHabit/FormAlcohol";
 import NewExerciseHabitForm from "../Habits/NewHabit/FormExercise";
@@ -23,8 +21,11 @@ import SmokingIcon from "../../assets/svgs/HabitsIcons/SmokingIcon.svg";
 import WorkoutIcon from "../../assets/svgs/HabitsIcons/WorkoutIcon.svg";
 import AlcoholIcon from "../../assets/svgs/HabitsIcons/AlcoholIcon.svg";
 import DietIcon from "../../assets/svgs/HabitsIcons/DietIcon.svg";
+import axios from "axios";
+import { AuthContext } from "../../store/auth-context";
 
-function WeeklyAgenda({ habits }) {
+const backendURL = "http://128.131.195.95:3000/habits";
+function WeeklyAgenda() {
   const CALENDAR_THEME = {
     calendarBackground: Colors.primaryBackgroundLight,
     textSectionTitleColor: "#b6c1cd", //color of Mon, Tue, Wed ...
@@ -55,6 +56,13 @@ function WeeklyAgenda({ habits }) {
 
   const [currentHabit, setCurrentHabit] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [habitsForDate, setHabitsForDate] = useState(null);
+  const authCtx = useContext(AuthContext);
+  const token = authCtx.token;
+
   // Specify how each date should be rendered. day can be undefined if the item is not first in that day
   const renderEmptyDay = () => {
     return <View styles={{ backgroundColor: Colors.primaryBackgroundLight }} />;
@@ -70,9 +78,19 @@ function WeeklyAgenda({ habits }) {
     setModalVisible(false);
   }
 
-  function deleteHabitHandler(id) {
+  async function deleteHabitHandler(id) {
     console.log(id);
-    setModalVisible(false);
+    try {
+      const response = await axios.delete(`${backendURL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      setModalVisible(false);
+    } catch (error) {
+      setModalVisible(false);
+    }
   }
 
   let habitForm;
@@ -154,6 +172,25 @@ function WeeklyAgenda({ habits }) {
     );
   };
 
+  ////////////
+  // Hooks //
+  ///////////
+  useEffect(() => {
+    const fetchHabits = async () => {
+      try {
+        const response = await axios.get(`${backendURL}/${selectedDate}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setHabitsForDate({ [selectedDate]: response.data.habits });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchHabits();
+  }, [selectedDate]);
+
   return (
     <SafeAreaView>
       <View
@@ -163,8 +200,13 @@ function WeeklyAgenda({ habits }) {
         }}>
         <Agenda
           firstDay={1}
-          items={{
-            "2024-09-27": habits,
+          items={habitsForDate}
+          // Callback that gets called on day press
+          onDayPress={(day) => {
+            const formattedMonth = String(day.month).padStart(2, "0"); // Ensures the month is two digits
+            const formattedDay = String(day.day).padStart(2, "0"); // Ensures the day is two digits
+            const formattedDate = `${day.year}-${formattedMonth}-${formattedDay}`;
+            setSelectedDate(formattedDate);
           }}
           renderDay={renderEmptyDay}
           renderEmptyData={renderEmptyItem}
@@ -196,7 +238,7 @@ function WeeklyAgenda({ habits }) {
             color={Colors.primaryBold}
             size={24}
             onPress={() => {
-              deleteHabitHandler(currentHabit.id);
+              deleteHabitHandler(currentHabit._id);
             }}
           />
         </View>
