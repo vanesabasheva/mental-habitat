@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Habit = require("../models/Habit");
 const HabitEntry = require("../models/HabitEntry");
 const WEEK_DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+const logger = require("../app");
 
 exports.getHabits = async (req, res) => {
   const userId = req.user.userId; // Extracted from decoded JWT
@@ -60,10 +61,7 @@ exports.postHabit = async (req, res) => {
   const category = habit.category;
   const userId = req.user.userId;
 
-  logger.info(
-    { action: "post_habit", userId, title, category },
-    "Creating new habit."
-  );
+  logger.info({ action: "post_habit", userId, title }, "Creating new habit.");
 
   try {
     let detailData;

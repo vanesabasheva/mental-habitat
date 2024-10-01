@@ -4,9 +4,8 @@ const bcrypt = require("bcrypt");
 const logger = require("../app");
 
 exports.postRegister = async (req, res) => {
+  const { email, fullName, password } = req.body;
   try {
-    const { email, fullName, password } = req.body;
-
     if (!email || !fullName || !password) {
       logger.warn(
         { error: "Invalid credentials provided", action: "register" },
