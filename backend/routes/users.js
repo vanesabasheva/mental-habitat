@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 const crypto = require("crypto");
 const authController = require("../controllers/auth");
+const logger = require("../app");
 
 router.post("/register", authController.postRegister);
 
@@ -41,7 +42,7 @@ router.post("/reset", async (req, res, next) => {
 
     crypto.randomBytes(32, (error, buffer) => {
       if (error) {
-        console.log(error);
+        logger.error({ error }, "Could not generate random bytes with crypto.");
         return res.status(500).json({ error: "Internal server error" });
       }
 

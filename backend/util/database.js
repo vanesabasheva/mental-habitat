@@ -4,7 +4,7 @@ const uri = process.env.MONGO_URI.replace(
 );
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const mongoose = require("mongoose");
-
+const logger = require("../app");
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -22,9 +22,9 @@ async function connect() {
       serverApi: ServerApiVersion.v1,
       autoIndex: true,
     });
-    console.log(`MongoDB Atlas Connected: ${conn.connection.host}`);
+    logger.info(`MongoDB Atlas Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error("Failed to connect to MongoDB", error);
+    logger.error({ error }, "Failed to connect to MongoDB");
     throw error;
   }
 }

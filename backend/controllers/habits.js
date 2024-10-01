@@ -5,43 +5,51 @@ const WEEK_DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
 exports.getHabits = async (req, res) => {
   const userId = req.user.userId; // Extracted from decoded JWT
-
+  logger.info({ action: "get_habits", userId }, "Fetching user habits.");
   try {
     const userWithHabits = await User.findById(userId).populate("habits");
     if (!userWithHabits) {
+      logger.warn({ action: "get_habits", userId }, "User not found.");
       return res.status(404).json({ message: "User not found" });
     }
+    logger.info(
+      { action: "get-habits", userId, count: userWithHabits.habits.length },
+      "User habits retrieved successfully."
+    );
     res.json({ habits: userWithHabits.habits });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error fetching user habits" });
+    handleError(res, error, "get-habits");
   }
 };
 
 exports.getHabitsByDate = async (req, res) => {
   const date = req.params.date;
   const dateObject = new Date(date);
-  console.log("Date from path param: " + date);
-  console.log("Date object: " + dateObject);
+  logger.debug(
+    { action: "parse_date", date, dateObject },
+    "Date parsing from path parameter."
+  );
 
   try {
     const index = dateObject.getDay();
-    console.log("Index of day " + index);
     const dayOfWeek = WEEK_DAYS[index];
-    console.log(dayOfWeek);
+    logger.debug(
+      { action: "find_habits_by_day", dayOfWeek },
+      "Fetching habits available for day of week."
+    );
 
     // Using $in to find documents where the dayOfWeek is in the selectedDaysOfWeek array
     const habits = await Habit.find({
       selectedDaysOfWeek: { $in: [dayOfWeek] },
       userId: req.user.userId,
     });
-    console.log(habits);
+    logger.info(
+      { action: "habits_by_date", dayOfWeek, count: habits.length },
+      "Habits for day fetched."
+    );
     res.json({ habits });
   } catch (error) {
-    console.error("Error retrieving habits:", error);
-    res
-      .status(500)
-      .json({ error: "Error fetching user habits for specified date" });
+    handleError(res, error, "habits_by_date");
   }
 };
 
@@ -51,6 +59,11 @@ exports.postHabit = async (req, res) => {
   const title = habit.title;
   const category = habit.category;
   const userId = req.user.userId;
+
+  logger.info(
+    { action: "post_habit", userId, title, category },
+    "Creating new habit."
+  );
 
   try {
     let detailData;
@@ -87,9 +100,15 @@ exports.postHabit = async (req, res) => {
     });
     await newHabit.save();
 
-    // Now, update the User document to include this new habit's ID in the 'habits' array
+    logger.info(
+      { action: "post_habit", habitId: newHabit._id },
+      "Habit created successfully."
+    );
+
+    // Update the User document to include this new habit's ID in the 'habits' array
     const user = await User.findById(userId);
     if (!user) {
+      logger.warn({ action: "post_habit", userId }, "User does not exist.");
       return res.status(404).json({ error: "User not found" });
     }
 
@@ -101,8 +120,7 @@ exports.postHabit = async (req, res) => {
       habit: newHabit,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to create habit" });
+    handleError(res, error, "post_habit");
   }
 };
 
@@ -110,10 +128,17 @@ exports.deleteHabit = async (req, res) => {
   const { habitId } = req.params;
   const userId = req.user.userId;
 
-  try {
-    const habitToDel = await Habit.findById(habitId);
+  logger.info(
+    { action: "delete_habit", userId, habitId },
+    "Attempting to delete habit."
+  );
 
+  try {
     const result = await Habit.findByIdAndDelete(habitId);
+    logger.info(
+      { action: "habit_deleted", habitId },
+      "Habit deleted successfully."
+    );
 
     const user = await User.findById(userId);
 
@@ -122,9 +147,7 @@ exports.deleteHabit = async (req, res) => {
     await user.save();
     res.status(204).send();
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Server error. Could not delete habit" + error });
+    handleError(res, error, "delete_habit");
   }
 };
 
@@ -139,6 +162,10 @@ exports.postHabitEntry = async (req, res) => {
       habitId: habitId,
       day: today,
     });
+    logger.info(
+      { action: "post_habit_entry", habitId: newHabit._id },
+      "Habit created successfully."
+    );
 
     if (entry) {
       return res
@@ -192,7 +219,10 @@ exports.deleteHabitEntry = async (req, res, next) => {
 
     const habitWithUser = await Habit.findById(habitId);
 
-    console.log("Habit:" + JSON.stringify(habitWithUser));
+    logger.info(
+      { action: "delete_habit_entry", habit: habitWithUser },
+      "Habit and user found."
+    );
     const statsUpdate = await updateStats(habitWithUser.category, user, false);
 
     res.status(200).json({
@@ -249,4 +279,9 @@ async function updateStats(category, user, isIncrementing) {
   } catch (error) {
     return { error: "Error updating user stats", details: error.message };
   }
+}
+
+function handleError(res, error, action) {
+  logger.error({ error, action: action }, "An error occurred.");
+  res.status(500).json({ error: "Server error!" });
 }

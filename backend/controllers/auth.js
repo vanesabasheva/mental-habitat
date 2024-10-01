@@ -1,14 +1,24 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const logger = require("../app");
 
 exports.postRegister = async (req, res) => {
   try {
     const { email, fullName, password } = req.body;
-    console.log(email + " " + password + " " + fullName);
+
     if (!email || !fullName || !password) {
+      logger.warn(
+        { error: "Invalid credentials provided", action: "register" },
+        "Validation failed during user registration."
+      );
       return res.status(400).json({ error: "Invalid credentials" });
     }
+
+    logger.info(
+      { action: "register", email },
+      "Registration attempt for email."
+    );
 
     const newUser = new User({
       email: email,
@@ -17,13 +27,11 @@ exports.postRegister = async (req, res) => {
     });
 
     const savedUser = await newUser.save();
-
-    console.log(savedUser);
     const token = generateToken(savedUser._id);
-
     res.json({ accessToken: token });
   } catch (e) {
     if (e.code === 11000) {
+      logger.warn({ action: "register", email }, "Email already in use.");
       res.status(400).json({
         error:
           "Email already used with another account. Please use a different email",
@@ -36,9 +44,12 @@ exports.postRegister = async (req, res) => {
 
 exports.postLogin = async (req, res) => {
   const { email, password } = req.body;
+  logger.info({ action: "login", email }, "Login attempt.");
   const user = await User.findOne({ email });
   try {
     if (!user) {
+      logger.warn({ action: "login", email }, "User does not exist.");
+
       return res
         .status(401)
         .json({ error: "User does not exist. Please sign up." });
@@ -46,12 +57,14 @@ exports.postLogin = async (req, res) => {
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
+      logger.warn({ action: "login", email }, "Password does not match.");
       return res
         .status(401)
         .json({ error: "Authentication failed. Wrong Password." });
     }
 
     const token = generateToken(user._id);
+    logger.info({ action: "login", email }, "Login successful.");
     res.json({ accessToken: token });
   } catch (error) {
     handleError(res, error);
@@ -60,7 +73,6 @@ exports.postLogin = async (req, res) => {
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    console.log(err);
     res.redirect("/");
   });
 };
@@ -74,6 +86,6 @@ function generateToken(userId) {
 }
 
 function handleError(res, error) {
-  console.error(error);
+  logger.error({ error }, "An error occurred.");
   res.status(500).json({ error: "Server error!" });
 }
