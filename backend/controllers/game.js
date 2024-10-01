@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const logger = require("../app");
+
 exports.postUseResources = async (req, res, next) => {
   try {
     const userId = req.user.userId;
@@ -71,7 +72,28 @@ exports.postUseResources = async (req, res, next) => {
       levelProgress: user.levelProgress,
     });
   } catch (error) {
-    logger.error({ error, action: { use_resources } }, "An error occurred.");
+    logger.error({ error, action: "use_resources" }, "An error occurred.");
     res.send(500).json({ error: "Failed to use resources" });
+  }
+};
+
+exports.getUserProgress = async (req, res) => {
+  const userId = req.user.userId;
+
+  try {
+    const user = await User.findById(userId);
+    logger.info(
+      { action: "get_stats", userId: userId },
+      "User stats requested."
+    );
+
+    res.status(200).json({
+      stats: user.stats,
+      levelProgress: user.levelProgress,
+      currentLevel: user.currentLevel,
+    });
+  } catch (error) {
+    logger.error({ error, action: "get_stats" }, "An error occurred.");
+    res.send(500).json({ error: "Failed to fetch user stats: " + error });
   }
 };

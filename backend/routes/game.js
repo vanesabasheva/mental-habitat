@@ -5,6 +5,8 @@ const gameController = require("../controllers/game");
 
 router.use(isAth);
 
+router.get("/progress", gameController.getUserProgress);
+
 router.post("/use-resources", gameController.postUseResources);
 
 module.exports = router;
