@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
-//import { HABITS } from "../../screens/Habits";
 import HabitItem from "../Habits/HabitItem";
-import { useState, useEffect, useContext } from "react";
+import { useState } from "react";
 import CustomModal from "../../ui/Modal";
 import NewAlcoholHabitForm from "../Habits/NewHabit/FormAlcohol";
 import NewExerciseHabitForm from "../Habits/NewHabit/FormExercise";
@@ -21,11 +20,14 @@ import SmokingIcon from "../../assets/svgs/HabitsIcons/SmokingIcon.svg";
 import WorkoutIcon from "../../assets/svgs/HabitsIcons/WorkoutIcon.svg";
 import AlcoholIcon from "../../assets/svgs/HabitsIcons/AlcoholIcon.svg";
 import DietIcon from "../../assets/svgs/HabitsIcons/DietIcon.svg";
-import axios from "axios";
-import { AuthContext } from "../../store/auth-context";
 
-const backendURL = "http://128.131.195.95:3000/habits";
-function WeeklyAgenda() {
+function WeeklyAgenda({
+  habitsForDate,
+  selectedDate,
+  setSelectedDate,
+  onDeleteHabit,
+  onEditHabit,
+}) {
   const CALENDAR_THEME = {
     calendarBackground: Colors.primaryBackgroundLight,
     textSectionTitleColor: "#b6c1cd", //color of Mon, Tue, Wed ...
@@ -56,43 +58,30 @@ function WeeklyAgenda() {
 
   const [currentHabit, setCurrentHabit] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
-  const [habitsForDate, setHabitsForDate] = useState(null);
-  const authCtx = useContext(AuthContext);
-  const token = authCtx.token;
 
   // Specify how each date should be rendered. day can be undefined if the item is not first in that day
   const renderEmptyDay = () => {
     return <View styles={{ backgroundColor: Colors.primaryBackgroundLight }} />;
   };
 
-  function editHabitHandler(habit) {
+  function openEditModal(habit) {
     setCurrentHabit(habit);
     setModalVisible(true);
   }
 
-  function submitHandler(habit) {
-    console.log("in weekly calendar" + JSON.stringify(habit));
+  function editHabitHandler(habit) {
+    onEditHabit(habit);
     setModalVisible(false);
   }
 
   async function deleteHabitHandler(id) {
-    console.log(id);
-    try {
-      const response = await axios.delete(`${backendURL}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.data);
-      setModalVisible(false);
-    } catch (error) {
-      setModalVisible(false);
-    }
+    onDeleteHabit(id);
+    setModalVisible(false);
   }
 
+  ///////////////////////////////////////////////
+  // Set the EDIT HABIT FORM based on category //
+  ///////////////////////////////////////////////
   let habitForm;
   let icon;
   if (currentHabit) {
@@ -102,7 +91,7 @@ function WeeklyAgenda() {
           <NewSmokingHabitForm
             buttonLabel="Update Habit"
             habit={currentHabit}
-            onAddNewHabit={submitHandler}
+            onAddNewHabit={editHabitHandler}
           />
         );
         icon = (
@@ -115,7 +104,7 @@ function WeeklyAgenda() {
           <NewExerciseHabitForm
             buttonLabel="Update Habit"
             habit={currentHabit}
-            onAddNewHabit={submitHandler}
+            onAddNewHabit={editHabitHandler}
           />
         );
         icon = (
@@ -128,7 +117,7 @@ function WeeklyAgenda() {
           <NewAlcoholHabitForm
             buttonLabel="Update Habit"
             habit={currentHabit}
-            onAddNewHabit={submitHandler}
+            onAddNewHabit={editHabitHandler}
           />
         );
         icon = (
@@ -141,7 +130,7 @@ function WeeklyAgenda() {
           <NewDietHabitForm
             buttonLabel="Update Habit"
             habit={currentHabit}
-            onAddNewHabit={submitHandler}
+            onAddNewHabit={editHabitHandler}
           />
         );
         icon = (
@@ -165,31 +154,13 @@ function WeeklyAgenda() {
 
   // Specify how each item should be rendered in the agenda
   const renderItems = (item, firstItemInDay) => {
+    console.log(selectedDate);
     return (
-      <TouchableOpacity onPress={() => editHabitHandler(item)}>
-        <HabitItem habit={item} />
+      <TouchableOpacity onPress={() => openEditModal(item)}>
+        <HabitItem habit={item} day={selectedDate} />
       </TouchableOpacity>
     );
   };
-
-  ////////////
-  // Hooks //
-  ///////////
-  useEffect(() => {
-    const fetchHabits = async () => {
-      try {
-        const response = await axios.get(`${backendURL}/${selectedDate}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setHabitsForDate({ [selectedDate]: response.data.habits });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchHabits();
-  }, [selectedDate]);
 
   return (
     <SafeAreaView>
@@ -212,7 +183,7 @@ function WeeklyAgenda() {
           renderEmptyData={renderEmptyItem}
           renderItem={renderItems}
           scrollEnabled={false}
-          selected={new Date().toString()} //Initially selected day
+          selected={selectedDate} //Initially selected day
           hideKnob={false} // Hide knob button. Default = false
           showClosingKnob // When `true` and `hideKnob` prop is `false`, the knob will always be visible and the user will be able to drag the knob up and close the calendar. Default = false
           theme={{

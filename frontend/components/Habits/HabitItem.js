@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet } from "react-native";
-import IconButton from "../../ui/ButtonIcon";
 import { Colors } from "../../constants/Colors";
 import Checkbox from "react-native-community-checkbox";
 import SmokingIcon from "../../assets/svgs/HabitsIcons/SmokingIcon.svg";
@@ -11,16 +10,22 @@ import WeightliftingIcon from "../../assets/svgs/HabitsIcons/WeightliftingIcon.s
 import RunningIcon from "../../assets/svgs/HabitsIcons/RunningIcon.svg";
 import AlcoholIcon from "../../assets/svgs/HabitsIcons/AlcoholIcon.svg";
 import DietIcon from "../../assets/svgs/HabitsIcons/DietIcon.svg";
-import { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { deviceWidth } from "../../constants/Dimensions";
+import { AuthContext } from "../../store/auth-context";
+import { StatsContext } from "../../store/stats-context";
+import axios from "axios";
+import { BACKEND_URL } from "@env";
 
-function HabitItem({ onLogHabit, onDeleteHabitLog, habit }) {
+function HabitItem({ habit, day }) {
   const { title, details, habitType, selectedDaysOfWeek, category } = habit;
-
   const { numberOfCigarettes, duration, distance, numberOfDrinks } = details;
-
+  const authCtx = useContext(AuthContext);
+  const statsCtx = useContext(StatsContext);
   const [isHabitChecked, setIsHabitChecked] = useState(false);
+  const [habitEntryId, setHabitEntryId] = useState();
+  const token = authCtx.token;
 
   let descriptionBasedOnCategory;
   let habitCategoryColor;
@@ -33,6 +38,7 @@ function HabitItem({ onLogHabit, onDeleteHabitLog, habit }) {
     checkedTextStyle = { color: "#999" };
   }
 
+  // Set descriptions of each habit based on category
   if (category === "Smoking") {
     let text = "Cigarettes/day";
     if (numberOfCigarettes == "1") {
@@ -177,20 +183,51 @@ function HabitItem({ onLogHabit, onDeleteHabitLog, habit }) {
     fillPercentage: 100, // Percentage of the checkbox that is filled when checked
   };
 
-  const handleCheck = () => {
+  const handleCheck = async () => {
     setIsHabitChecked(true);
     try {
-      //make an http post request to /habits/habitEntry
+      console.log("Checking habit... " + BACKEND_URL + "/habits/habitEntry");
+      console.log(day);
+      const response = await axios.post(
+        BACKEND_URL + "/habits/habitEntry",
+        {
+          habitId: habit._id,
+          day: day,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log(response.data);
+
+      const habitEntry = response.data.habitEntry;
+      console.log(habitEntry);
+      setHabitEntryId(habitEntry._id);
+
+      const stats = response.data.stats;
+      statsCtx.incrementStat(stats.updatedStat, stats.increment);
     } catch (error) {
+      console.log(error);
       setIsHabitChecked(false);
     }
   };
 
-  const handleUncheck = () => {
+  const handleUncheck = async () => {
     setIsHabitChecked(false);
     try {
-      // make an http delete request to /habits/habitEntry
+      console.log(habit._id);
+      const response = await axios.delete(
+        BACKEND_URL + "/habits/habitEntry/" + habitEntryId,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log(response.data);
+      const stats = response.data.stats;
+      statsCtx.incrementStat(stats.updatedStat, stats.increment);
     } catch (error) {
+      console.log(error);
       setIsHabitChecked(true);
     }
   };
@@ -203,6 +240,44 @@ function HabitItem({ onLogHabit, onDeleteHabitLog, habit }) {
       handleCheck();
     }
   };
+
+  useEffect(() => {
+    console.log(
+      "Fetching log for the day initiated..." +
+        BACKEND_URL +
+        "/habits/habitEntry"
+    );
+    const fetchHabitEntryForDay = async () => {
+      try {
+        const response = await axios.get(BACKEND_URL + "/habits/habitEntry", {
+          params: {
+            habitId: habit._id,
+            day: day,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("Response entry id: " + JSON.stringify(response.data._id));
+        setHabitEntryId(response.data._id);
+        setIsHabitChecked(true);
+        if (response.data) {
+          console.log("Success");
+        }
+        // setHabitEntryId(habitEntry)
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          // Handle 404 specifically
+
+          console.log("Habit entry not found.");
+        } else {
+          // Handle other errors
+          console.error("An error occurred:", error.message);
+        }
+      }
+    };
+
+    fetchHabitEntryForDay();
+  }, []);
 
   return (
     <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>

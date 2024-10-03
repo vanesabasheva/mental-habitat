@@ -10,6 +10,7 @@ import {
   ImageBackground,
 } from "react-native";
 import { AuthContext } from "../store/auth-context";
+import { StatsContext } from "../store/stats-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "../constants/Colors";
 import { useAssets } from "expo-asset";
@@ -23,7 +24,8 @@ import axios from "axios";
 const imageSrc = require("../assets/imgs/level1.png");
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
-const backendURL = "http://128.131.195.95:3000/game";
+import { BACKEND_URL } from "@env";
+const backendURL = BACKEND_URL + "/game";
 
 function HomeScreen() {
   const authCtx = useContext(AuthContext);
@@ -36,19 +38,20 @@ function HomeScreen() {
   /////////////////////////////////////////////
   // Set User Progress and stats (resources) //
   ////////////////////////////////////////////
-  const [stats, setStats] = useState({});
+  const { stats, incrementStat, setAllStats } = useContext(StatsContext);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [levelProgress, setLevelProgress] = useState(0);
 
   useEffect(() => {
+    console.log(BACKEND_URL);
     const fetchStats = async () => {
       try {
-        const response = await axios.get(`${backendURL}/progress`, {
+        const response = await axios.get(`${BACKEND_URL}/game/progress`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setStats(response.data.stats);
+        setAllStats(response.data.stats);
         setLevelProgress(response.data.levelProgress);
         setCurrentLevel(response.data.currentLevel);
       } catch (error) {

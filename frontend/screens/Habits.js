@@ -3,7 +3,6 @@ import {
   Text,
   View,
   SafeAreaView,
-  Dimensions,
   Modal,
   Pressable,
   ScrollView,
@@ -25,29 +24,24 @@ import NewDietHabitForm from "../components/Habits/NewHabit/FormDiet";
 import { deviceHeight, deviceWidth } from "../constants/Dimensions";
 import axios from "axios";
 import { AuthContext } from "../store/auth-context";
+import { BACKEND_URL } from "@env";
 
 const emulatorBaseURL = "http://10.0.2.2:3000/habits";
-const backendURL = "http://128.131.195.95:3000/habits";
+const backendURL = BACKEND_URL + "/habits";
 
 function HabitsScreen() {
   const { token } = useContext(AuthContext);
-  const [selectedDate, setSelectedDate] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Habits State Management
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [habitsForDate, setHabitsForDate] = useState(null);
+
   const [currentForm, setCurrentForm] = useState(
     <NewSmokingHabitForm onAddNewHabit={saveHabit} />
   );
-
-  async function saveHabit(habitObject) {
-    try {
-      const response = await axios.post(backendURL, habitObject, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setModalVisible(false);
-    } catch (error) {
-      console.log("Error saving habit: " + error);
-    }
-  }
-
   function pickCategoryHandler(category) {
     switch (category) {
       case "Smoking":
@@ -66,6 +60,66 @@ function HabitsScreen() {
         break;
     }
   }
+
+  async function saveHabit(habitObject) {
+    try {
+      const response = await axios.post(backendURL, habitObject, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      await fetchHabits();
+
+      setModalVisible(false);
+    } catch (error) {
+      console.log("Error saving habit: " + error);
+    }
+  }
+
+  async function deleteHabitHandler(id) {
+    console.log(id);
+    try {
+      const response = await axios.delete(`${backendURL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setHabitsForDate((prevHabits) => {
+        const filteredHabits = prevHabits[selectedDate].filter(
+          (item) => item._id !== id
+        );
+        return { [selectedDate]: filteredHabits };
+      });
+    } catch (error) {
+      console.log("could not delete habit " + id);
+      console.log(error);
+    }
+  }
+
+  async function editHabitHandler(habit) {
+    console.log(habit);
+  }
+
+  const fetchHabits = async () => {
+    console.log("Fetching habits... " + backendURL);
+    try {
+      const response = await axios.get(`${backendURL}/${selectedDate}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setHabitsForDate({ [selectedDate]: response.data.habits });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  ////////////
+  // Hooks //
+  ///////////
+  useEffect(() => {
+    fetchHabits();
+  }, [selectedDate]);
 
   return (
     <>
@@ -126,7 +180,13 @@ function HabitsScreen() {
           </Modal>
         </View>
 
-        <WeeklyAgenda />
+        <WeeklyAgenda
+          habitsForDate={habitsForDate}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          onDeleteHabit={deleteHabitHandler}
+          onEditHabit={editHabitHandler}
+        />
       </SafeAreaView>
     </>
   );
