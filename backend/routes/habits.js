@@ -5,6 +5,13 @@ const habitsController = require("../controllers/habits");
 
 router.use(isAuth); //users need to be authenticated for all routes
 
+//Specific routes
+router.get("/habitEntry", habitsController.getHabitEntry);
+
+router.post("/habitEntry", habitsController.postHabitEntry);
+
+router.delete("/habitEntry/:habitEntryId", habitsController.deleteHabitEntry);
+
 router.get("/", habitsController.getHabits);
 
 router.post("/", habitsController.postHabit);
@@ -12,9 +19,5 @@ router.post("/", habitsController.postHabit);
 router.delete("/:habitId", habitsController.deleteHabit);
 
 router.get("/:date", habitsController.getHabitsByDate);
-
-router.post("/habitEntry", habitsController.postHabitEntry);
-
-router.delete("/habitEntry", habitsController.deleteHabitEntry);
 
 module.exports = router;

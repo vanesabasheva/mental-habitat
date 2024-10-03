@@ -150,77 +150,198 @@ exports.deleteHabit = async (req, res) => {
 };
 
 exports.postHabitEntry = async (req, res) => {
+  const { habitId, day } = req.body;
+  const userId = req.user.userId;
   try {
-    const { habitId } = req.body;
-    const userId = req.user.userId;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // reset time to start of the day (one habit entry per day allowed)
+    console.log(day);
 
-    const entry = HabitEntry.findOne({
-      habitId: habitId,
-      day: today,
-    });
+    if (!day || new Date(day).toString() === "Invalid Date") {
+      console.log(day);
+      return res.status(400).json({ message: "Invalid or missing date." });
+    }
+
     logger.info(
-      { action: "post_habit_entry", habitId: newHabit._id },
-      "Habit created successfully."
+      {
+        action: "post_habit_entry",
+        habitId: habitId,
+        day: day,
+      },
+      "Habit entry log for the day."
     );
 
+    const entry = await HabitEntry.findOne({
+      habitId: habitId,
+      day: day,
+    });
+
     if (entry) {
+      logger.warn(
+        {
+          action: "post_habit_entry",
+          habitId: habitId,
+          habitEntryId: entry._id,
+        },
+        "Habit already logged for today."
+      );
+
       return res
-        .status(400)
+        .status(409)
         .json({ message: "Habit already logged for today" });
     }
 
     const habit = await Habit.findById(habitId);
     if (!habit) {
+      logger.warn(
+        {
+          action: "post_habit_entry",
+          habitId: habitId,
+        },
+        "Habit not found."
+      );
       return res.status(404).json({ message: "Habit not found" });
     }
 
+    const normalizedDay = new Date(day);
+    normalizedDay.setHours(0, 0, 0, 0);
+
     const newHabitEntry = await HabitEntry.create({
       habitId: habitId,
-      day: today,
+      day: normalizedDay,
       //details: details ? details : null,
     });
 
-    const user = await User.findByI(userId);
+    const user = await User.findById(userId);
 
     if (!user) {
+      logger.warn(
+        {
+          action: "post_habit_entry",
+          habitId: habitId,
+        },
+        "User not found."
+      );
       return res.status(404).json({ message: "User not found" });
     }
 
     const statsUpdate = await updateStats(habit.category, user, true);
 
     if (statsUpdate.error) {
-      res.status(500).json(statsUpdate);
+      logger.warn(
+        {
+          action: "post_habit_entry",
+          habitId: habitId,
+        },
+        "Error occurred whilst updating stats."
+      );
+      return res.status(500).json(statsUpdate);
     }
+
+    logger.info(
+      {
+        action: "post_habit_entry",
+        habitId: habitId,
+        day: day,
+      },
+      "Habit entry log for the day successfully logged."
+    );
     res.status(201).json({ habitEntry: newHabitEntry, stats: statsUpdate });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Server error. Could not save habit: " + error });
+    // if (error.code === 11000) {
+    //   // Handle duplicate key error
+    //   logger.error(
+    //     {
+    //       action: "post_habit_entry",
+    //       habitId: habitId,
+    //       day: day,
+    //     },
+    //     "ERROR 11000: Habit already logged for today."
+    //   );
+    //   return res
+    //     .status(409)
+    //     .json({ message: "Duplicate entry. Please retry." });
+    // }
+    handleError(res, error, "post_habit_entry");
+  }
+};
+
+exports.getHabitEntry = async (req, res) => {
+  const { habitId, day } = req.query;
+  try {
+    logger.info(
+      {
+        action: "get_habit_entry",
+        habitId: habitId,
+        day: day,
+      },
+      "Habit entry log requested for the day."
+    );
+
+    const normalizedDay = new Date(day);
+    normalizedDay.setHours(0, 0, 0, 0);
+
+    const habitEntry = await HabitEntry.findOne({
+      habitId: habitId,
+      day: normalizedDay,
+    });
+
+    if (!habitEntry) {
+      logger.info(
+        {
+          action: "get_habit_entry",
+          habitId: habitId,
+          day: day,
+        },
+        "Habit entry does not exist for the day."
+      );
+      return res.status(404).json({ message: "Habit entry not found" });
+    }
+    logger.info(
+      {
+        action: "get_habit_entry",
+        habitId: habitId,
+        day: day,
+      },
+      "Sending Habit entry for the day..."
+    );
+
+    return res.status(200).json(habitEntry);
+  } catch (error) {
+    handleError(res, error, "get_habit_entry");
   }
 };
 
 exports.deleteHabitEntry = async (req, res, next) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const { habitEntryId } = req.params;
 
+  logger.info(
+    { action: "delete_habit_entry", habitEntryId: habitEntryId },
+    "Attempt to delete habit entry for the day"
+  );
   try {
-    const { habitId } = req.body;
-    const result = await HabitEntry.deleteOne({
-      habitId: habitId,
-      day: today,
-    });
+    const habitEntry = await HabitEntry.findById(habitEntryId);
+    if (!habitEntry) {
+      logger.warn(
+        { action: "delete_habit_entry", habitEntryId },
+        "Habit entry not found."
+      );
+      return res.status(404).json({ message: "Habit entry not found" });
+    }
 
     const userId = req.user.userId;
     const user = await User.findById(userId);
-
-    const habitWithUser = await Habit.findById(habitId);
+    const habitWithUser = await Habit.findById(habitEntry.habitId);
 
     logger.info(
       { action: "delete_habit_entry", habit: habitWithUser },
       "Habit and user found."
     );
+
+    const result = await HabitEntry.findByIdAndDelete(habitEntryId);
+    logger.info(
+      { action: "delete_habit_entry", habitEntryId },
+      "Habit entry deleted successfully."
+    );
+
     const statsUpdate = await updateStats(habitWithUser.category, user, false);
 
     res.status(200).json({
@@ -240,29 +361,52 @@ async function updateStats(category, user, isIncrementing) {
     const multiplier = 5 / level;
     const increment = Math.ceil(multiplier);
     let updatedStat;
+    let actualIncrement = 0;
+
+    const applyIncrement = (currentValue, incrementValue) => {
+      // Increment, but cap the value at 10
+      const newValue = Math.min(currentValue + incrementValue, 10);
+      actualIncrement = newValue - currentValue;
+      return;
+    };
+
+    const applyDecrement = (currentValue, decrementValue) => {
+      const newValue = Math.max(currentValue - decrementValue, 0);
+      actualIncrement = currentValue - newValue; // Negative because it's a decrement
+      return newValue;
+    };
+
     switch (category) {
       case "Smoking":
-        user.stats.engines = isIncrementing
-          ? user.stats.engines + increment
-          : user.stats.engines - increment;
+        if (isIncrementing) {
+          user.stats.engines = applyIncrement(user.stats.engines, increment);
+        } else {
+          user.stats.engines = applyDecrement(user.stats.engines, increment);
+        }
         updatedStat = "engines";
         break;
       case "Exercise":
-        user.stats.energy = isIncrementing
-          ? user.stats.energy + increment
-          : user.stats.energy - increment;
+        if (isIncrementing) {
+          user.stats.energy = applyIncrement(user.stats.energy, increment);
+        } else {
+          user.stats.energy = applyDecrement(user.stats.energy, increment);
+        }
         updatedStat = "energy";
         break;
       case "Alcohol":
-        user.stats.fuel = isIncrementing
-          ? user.stats.fuel + increment
-          : user.stats.fuel - increment;
+        if (isIncrementing) {
+          user.stats.fuel = applyIncrement(user.stats.fuel, increment);
+        } else {
+          user.stats.fuel = applyDecrement(user.stats.fuel, increment);
+        }
         updatedStat = "fuel";
         break;
       case "Diet":
-        user.stats.grip = isIncrementing
-          ? user.stats.grip + increment
-          : user.stats.grip - increment;
+        if (isIncrementing) {
+          user.stats.grip = applyIncrement(user.stats.grip, increment);
+        } else {
+          user.stats.grip = applyDecrement(user.stats.grip, increment);
+        }
         updatedStat = "grip";
         break;
       default:
@@ -272,7 +416,7 @@ async function updateStats(category, user, isIncrementing) {
     await user.save();
     return {
       updatedStat: updatedStat,
-      increment: increment,
+      increment: isIncrementing ? actualIncrement : -actualIncrement,
     };
   } catch (error) {
     return { error: "Error updating user stats", details: error.message };
