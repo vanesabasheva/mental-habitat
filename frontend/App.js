@@ -14,6 +14,7 @@ import { View, Text, SafeAreaView } from "react-native";
 import IconButton from "./ui/ButtonIcon";
 import BottomTab from "./components/Navigation/BottomTab";
 import DrawerNav from "./components/Navigation/Drawer";
+import StatsContextProvider from "./store/stats-context";
 //SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 
@@ -80,10 +81,12 @@ export default function App() {
     <>
       <StatusBar />
       <AuthContextProvider>
-        <SafeAreaView
-          style={{ flex: 1, backgroundColor: Colors.primaryBackgroundLight }}>
-          <Navigation />
-        </SafeAreaView>
+        <StatsContextProvider>
+          <SafeAreaView
+            style={{ flex: 1, backgroundColor: Colors.primaryBackgroundLight }}>
+            <Navigation />
+          </SafeAreaView>
+        </StatsContextProvider>
       </AuthContextProvider>
     </>
   );
