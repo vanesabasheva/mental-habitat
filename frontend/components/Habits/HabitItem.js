@@ -187,7 +187,6 @@ function HabitItem({ habit, day }) {
     setIsHabitChecked(true);
     try {
       console.log("Checking habit... " + BACKEND_URL + "/habits/habitEntry");
-      console.log(day);
       const response = await axios.post(
         BACKEND_URL + "/habits/habitEntry",
         {
@@ -257,18 +256,13 @@ function HabitItem({ habit, day }) {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("Response entry id: " + JSON.stringify(response.data._id));
+        console.log("Response entry._id: " + JSON.stringify(response.data._id));
         setHabitEntryId(response.data._id);
         setIsHabitChecked(true);
-        if (response.data) {
-          console.log("Success");
-        }
-        // setHabitEntryId(habitEntry)
       } catch (error) {
         if (error.response && error.response.status === 404) {
           // Handle 404 specifically
-
-          console.log("Habit entry not found.");
+          console.log(`No habit entry for this day ${day}.`);
         } else {
           // Handle other errors
           console.error("An error occurred:", error.message);

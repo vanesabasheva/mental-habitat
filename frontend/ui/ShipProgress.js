@@ -6,8 +6,16 @@ import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { deviceWidth, deviceHeight } from "../constants/Dimensions";
-function ShipProgress({ stats }) {
+import { BACKEND_URL } from "@env";
+import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../store/auth-context";
+const backendURL = BACKEND_URL + "/game";
+
+function ShipProgress({ stats, setCurrentLevel, setLevelProgress }) {
   const keysArray = Object.keys(stats);
+  const authCtx = useContext(AuthContext);
+  const token = authCtx.token;
 
   let progress = 0;
   keysArray.forEach((key) => {
@@ -15,6 +23,31 @@ function ShipProgress({ stats }) {
   });
 
   const isDisabled = progress < 40;
+
+  async function initiateMissionHandler() {
+    try {
+      const response = await axios.post(
+        `${backendURL}/use-resources`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log(response.data);
+      console.log(response.data.levelProgress);
+      console.log(response.data.currentLevel);
+
+      const levelProgress = response.data.levelProgress;
+      const currentLevel = response.data.currentLevel;
+      setLevelProgress(levelProgress);
+      setCurrentLevel(currentLevel);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <View style={{ alignItems: "center" }}>
@@ -37,7 +70,6 @@ function ShipProgress({ stats }) {
             size={24}
             color={Colors.primaryBold}
           />
-          <SimpleLineIcons name="energy" size={24} color={Colors.primaryBold} />
           <FontAwesome5
             name="grip-lines"
             size={24}
@@ -48,6 +80,7 @@ function ShipProgress({ stats }) {
             size={24}
             color={Colors.primaryBold}
           />
+          <SimpleLineIcons name="energy" size={24} color={Colors.primaryBold} />
         </View>
         {/*Progress bar one*/}
 
@@ -69,7 +102,8 @@ function ShipProgress({ stats }) {
       <Button
         newStyles={{ width: deviceWidth * 0.6, alignSelf: "center" }}
         textStyles={{ fontFamily: "robotomono-bold", fontSize: 12 }}
-        disabled={isDisabled}>
+        disabled={isDisabled}
+        onPress={initiateMissionHandler}>
         Initiate Launch
       </Button>
     </View>

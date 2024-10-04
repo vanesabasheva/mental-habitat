@@ -4,8 +4,8 @@ export const StatsContext = createContext({
   stats: {
     engines: 0,
     energy: 0,
-    fuel: 0,
     grip: 0,
+    fuel: 0,
   },
   incrementStat: () => {},
   setAllStats: () => {},
@@ -14,9 +14,9 @@ export const StatsContext = createContext({
 function StatsContextProvider({ children }) {
   const [stats, setStats] = useState({
     engines: 0,
-    energy: 0,
-    fuel: 0,
     grip: 0,
+    fuel: 0,
+    energy: 0,
   });
 
   const incrementStat = (updatedStat, increment) => {

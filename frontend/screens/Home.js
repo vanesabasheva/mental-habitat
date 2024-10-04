@@ -60,7 +60,7 @@ function HomeScreen() {
     };
 
     fetchStats();
-  }, []);
+  }, [levelProgress]);
 
   return (
     <>
@@ -121,7 +121,10 @@ function HomeScreen() {
             Welcome back, {userFirstName}!
           </Text>
           {/* {Engines} */}
-          <ShipProgress stats={stats}></ShipProgress>
+          <ShipProgress
+            stats={stats}
+            setLevelProgress={setLevelProgress}
+            setCurrentLevel={setCurrentLevel}></ShipProgress>
         </View>
 
         <View style={{ alignSelf: "flex-end", zIndex: 10 }}>
