@@ -17,10 +17,6 @@ function Settings() {
       </View>
       <View>
         <Text>
-          <Ionicons name="stats-chart-outline" size={24} color="black" />
-          Statistics
-        </Text>
-        <Text>
           <Ionicons name="planet-outline" size={24} color="black" />{" "}
           Achievements
         </Text>

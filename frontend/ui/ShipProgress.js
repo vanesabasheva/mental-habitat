@@ -5,6 +5,7 @@ import ProgressBar from "./ProgressBar";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Spaceship from "../assets/svgs/Spaceship.svg";
 import { deviceWidth, deviceHeight } from "../constants/Dimensions";
 import { BACKEND_URL } from "@env";
 import axios from "axios";

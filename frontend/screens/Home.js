@@ -14,10 +14,17 @@ import { StatsContext } from "../store/stats-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { Colors } from "../constants/Colors";
 import { useAssets } from "expo-asset";
+import { deviceHeight, deviceWidth } from "../constants/Dimensions";
+
 import Ionicons from "@expo/vector-icons/Ionicons";
-import PlanetLevel1 from "../assets/svgs/PlanetLevel1.svg";
+import PlanetLevel1 from "../assets/svgs/LevelsIcons/PlanetLevel1.svg";
+import PlanetLevel2 from "../assets/svgs/LevelsIcons/PlanetLevel2.svg";
+import PlanetLevel3 from "../assets/svgs/LevelsIcons/PlanetLevel3.svg";
+import PlanetLevel4 from "../assets/svgs/LevelsIcons/PlanetLevel4.svg";
+
 import GreyPlanet from "../assets/svgs/GreyPlanet.svg";
 import ProgressStarsBackground from "../assets/svgs/ProgressStarsBackground.svg";
+import Spaceship from "../assets/svgs/Spaceship.svg";
 import ProgressBar from "../ui/ProgressBar";
 import ShipProgress from "../ui/ShipProgress";
 import axios from "axios";
@@ -26,6 +33,39 @@ const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 import { BACKEND_URL } from "@env";
 const backendURL = BACKEND_URL + "/game";
+
+const LEVELS = [
+  {
+    icon: <PlanetLevel1 width={200} height={200} />,
+    planetName: "KP403",
+    planetDescription: "a place of peace and quite",
+    story:
+      "Planet KP403, known to the interstellar community as Whisper, has long been shrouded in mystery. Ancient space records hint at a civilization that once thrived here, skilled in harmonizing technology with nature. However, hundreds of years ago, a sudden and unexplained silence fell over the planet, and it has since been left untouched and forgotten by the wider galaxy. Legend has it that KP403 was a hub for the brightest minds, a place where scientists and artists alike gathered to share knowledge and ideas. Their cities were said to glow gently at night, a testament to their commitment to balance and peace. However one fateful day...",
+  },
+  {
+    icon: <PlanetLevel2 width={200} height={200} />,
+    planetName: "Veloria",
+    planetDescription:
+      "a mesmerizing sea of soft pink grass, warm breeze and pink skies",
+    story:
+      "Captain Starling and his crew were awestruck as they approached the vivid horizon of Veloria—a planet of legends, said to be both a paradise and a peril. Swirling mists of soft pink light enveloped the planet, casting an otherworldly glow across the sleek hull of their ship as they descended. Beneath them stretched an endless expanse of pink grass, interwoven with rivers that shimmered like liquid stardust under the strange twilight skies. But the peaceful exterior masked an ancient enigma, with eerie tales of explorers who had come seeking rest and never left.",
+  },
+  {
+    icon: <PlanetLevel3 width={230} height={230} />,
+    planetName: "Eclipsion",
+    planetDescription:
+      "a planet, shrouded in mystery — a world where the land was soft and rolling",
+    story:
+      "As your ship touched down on the velvety surface, the crew was greeted by a seemingly peaceful scene. Fluffy, pastel-colored cats with luminous eyes watched curiously from a distance. Their fur rippled in shades of brown, white, and peach, almost as if the planet’s strange energy flowed through them. But Captain Starling could feel it in the air—a tension, a secret buried beneath the calm. The crew soon discovered that these creatures weren’t just passive observers... ",
+  },
+  {
+    icon: <PlanetLevel4 width={250} height={250} />,
+    planetName: "Aquila-9",
+    planetDescription: "an archipelago of islands suspended in a sea of mist",
+    story:
+      "Aquila-9, a world of both wonder and danger, was a planet of myths whispered across the galaxy. Legends spoke of its mystical birds and the ancient power hidden within its high cliffs. The crew marveled at the sight of flocks of alien birds, known as the Lyran. It was said they held the keys to unlocking Aquila-9’s greatest secret: the Celestial Core, a mysterious energy source capable of harnessing the very forces of creation...",
+  },
+];
 
 function HomeScreen() {
   const authCtx = useContext(AuthContext);
@@ -36,12 +76,21 @@ function HomeScreen() {
   const [assets, error] = useAssets([require("../assets/imgs/level1.png")]);
 
   /////////////////////////////////////////////
-  // Set User Progress and stats (resources) //
+  // Initialize User Progress and stats (resources) //
   ////////////////////////////////////////////
   const { stats, incrementStat, setAllStats } = useContext(StatsContext);
-  const [currentLevel, setCurrentLevel] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(1);
   const [levelProgress, setLevelProgress] = useState(0);
 
+  // Spaceship params //
+  // TODO: think about animation of ship
+  //////////////////////
+
+  const spaceshipPositionHorizontal = deviceWidth * 5 * (10 / 100);
+  const spaceshipPositionVertical = deviceHeight * 0.5;
+
+  ////// HOOKS /////
+  //////////////////
   useEffect(() => {
     console.log(BACKEND_URL);
     const fetchStats = async () => {
@@ -61,6 +110,20 @@ function HomeScreen() {
 
     fetchStats();
   }, [levelProgress]);
+
+  const level = LEVELS[currentLevel - 1];
+  useEffect(() => {
+    Alert.alert(
+      "New Planet Reached!",
+      `Congratulations, you've reached the next level. It's time to explore the new planet!`,
+      [
+        {
+          text: "Close",
+          onPress: () => console.log("Close Pressed"),
+        },
+      ]
+    );
+  }, [currentLevel]);
 
   return (
     <>
@@ -90,27 +153,17 @@ function HomeScreen() {
                 onPress={() => setModalVisible(!modalVisible)}>
                 <Ionicons name="remove" size={32} color="black" />
               </Pressable>
-              <Text style={styles.modalText}>MISSION 1</Text>
+              <Text style={styles.modalText}>MISSION {currentLevel}</Text>
               <Text
                 style={{
                   fontSize: 18,
                   fontFamily: "robotomono-bold",
                   marginBottom: 10,
                 }}>
-                Planet KP403 Story
+                Planet {level.planetName}'s Story
               </Text>
               <Text style={{ fontSize: 14, fontFamily: "robotomono-regular" }}>
-                Planet KP403, known to the interstellar community as "Whisper,"
-                has long been shrouded in mystery. Ancient space records hint at
-                a civilization that once thrived here, skilled in harmonizing
-                technology with nature. However, hundreds of years ago, a sudden
-                and unexplained silence fell over the planet, and it has since
-                been left untouched and forgotten by the wider galaxy. Legend
-                has it that KP403 was a hub for the brightest minds, a place
-                where scientists and artists alike gathered to share knowledge
-                and ideas. Their cities were said to glow gently at night, a
-                testament to their commitment to balance and peace. However one
-                fateful day...
+                {level.story}
               </Text>
             </View>
           </View>
@@ -154,7 +207,7 @@ function HomeScreen() {
               },
               styles.wrapperCustom,
             ]}>
-            <PlanetLevel1 width={200} height={200} />
+            {level.icon}
           </Pressable>
 
           {/* {SpaceShip} */}
@@ -174,6 +227,15 @@ function HomeScreen() {
             />
           </View>
         </View>
+        {/* <View
+          style={{
+            position: "absolute",
+            left: spaceshipPositionHorizontal,
+            top: spaceshipPositionVertical - spaceshipPositionHorizontal * 0.4,
+            transform: [{ rotate: "-20deg" }],
+          }}>
+          <Spaceship width={75} height={75} />
+        </View> */}
 
         <View style={styles.messageContainer}>
           <LinearGradient
@@ -183,8 +245,8 @@ function HomeScreen() {
           />
 
           <Text style={{ fontFamily: "robotomono-regular", fontSize: 12 }}>
-            You've landed on the KP403, a place of peace and quiet. Click on the
-            planet to reveal its secrets!
+            You've landed on the {level.planetName}, {level.planetDescription}.
+            Click on the planet to reveal its secrets!
           </Text>
         </View>
       </View>
