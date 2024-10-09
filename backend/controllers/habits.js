@@ -3,6 +3,7 @@ const Habit = require("../models/Habit");
 const HabitEntry = require("../models/HabitEntry");
 const WEEK_DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 const logger = require("../app");
+const { default: mongoose } = require("mongoose");
 
 exports.getHabits = async (req, res) => {
   const userId = req.user.userId; // Extracted from decoded JWT
@@ -246,20 +247,6 @@ exports.postHabitEntry = async (req, res) => {
     );
     res.status(201).json({ habitEntry: newHabitEntry, stats: statsUpdate });
   } catch (error) {
-    // if (error.code === 11000) {
-    //   // Handle duplicate key error
-    //   logger.error(
-    //     {
-    //       action: "post_habit_entry",
-    //       habitId: habitId,
-    //       day: day,
-    //     },
-    //     "ERROR 11000: Habit already logged for today."
-    //   );
-    //   return res
-    //     .status(409)
-    //     .json({ message: "Duplicate entry. Please retry." });
-    // }
     handleError(res, error, "post_habit_entry");
   }
 };
@@ -355,6 +342,9 @@ exports.deleteHabitEntry = async (req, res, next) => {
   }
 };
 
+///////////////////////
+// Helper Functions //
+//////////////////////
 async function updateStats(category, user, isIncrementing) {
   try {
     level = user.currentLevel;
@@ -366,13 +356,15 @@ async function updateStats(category, user, isIncrementing) {
     const applyIncrement = (currentValue, incrementValue) => {
       // Increment, but cap the value at 10
       const newValue = Math.min(currentValue + incrementValue, 10);
+      console.log("In Increment" + actualIncrement);
       actualIncrement = newValue - currentValue;
-      return;
+      return newValue;
     };
 
     const applyDecrement = (currentValue, decrementValue) => {
       const newValue = Math.max(currentValue - decrementValue, 0);
       actualIncrement = currentValue - newValue; // Negative because it's a decrement
+      console.log("In Decrement" + actualIncrement);
       return newValue;
     };
 
@@ -420,6 +412,23 @@ async function updateStats(category, user, isIncrementing) {
     };
   } catch (error) {
     return { error: "Error updating user stats", details: error.message };
+  }
+}
+
+async function getHabitCategoriesForUser(userId) {
+  try {
+    const habitCategories = await Habit.aggregate([
+      { $match: { userId: mongoose.Types.ObjectId(userId) } },
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return habitCategories;
+  } catch (error) {
+    return {
+      error: "Error fetching habit cateogries for user",
+      details: error.message,
+    };
   }
 }
 
