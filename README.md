@@ -19,6 +19,7 @@ Download Expo App on iOS and scan QR code in the console provided by Expo.
 Figma Prototype: https://www.figma.com/proto/ZhuoZPjffDXkTn6Rs7QWiS/MentalHabitat?node-id=9-476&node-type=CANVAS&t=mdtYbLsubuaAGyMP-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=9%3A476
 
 Android App:
+
 ![android-home-screen](https://github.com/user-attachments/assets/f67e646e-fa3d-43ea-ae55-83a12a6c4890)
 ![android-habits-statistics](https://github.com/user-attachments/assets/89cc30eb-40e7-4fad-b9c8-a5c34d4660cb)
 
