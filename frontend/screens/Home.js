@@ -24,6 +24,8 @@ import PlanetLevel4 from "../assets/svgs/LevelsIcons/PlanetLevel4.svg";
 
 import GreyPlanet from "../assets/svgs/GreyPlanet.svg";
 import ProgressStarsBackground from "../assets/svgs/ProgressStarsBackground.svg";
+import BackgroundStarsBig from "../assets/svgs/BackgroundStarsBig.svg";
+
 import Spaceship from "../assets/svgs/Spaceship.svg";
 import ProgressBar from "../ui/ProgressBar";
 import ShipProgress from "../ui/ShipProgress";
@@ -45,16 +47,14 @@ const LEVELS = [
   {
     icon: <PlanetLevel2 width={200} height={200} />,
     planetName: "Veloria",
-    planetDescription:
-      "a mesmerizing sea of soft pink grass, warm breeze and pink skies",
+    planetDescription: "a mesmerizing sea of soft pink grass and pink skies",
     story:
       "Captain Starling and his crew were awestruck as they approached the vivid horizon of Veloria—a planet of legends, said to be both a paradise and a peril. Swirling mists of soft pink light enveloped the planet, casting an otherworldly glow across the sleek hull of their ship as they descended. Beneath them stretched an endless expanse of pink grass, interwoven with rivers that shimmered like liquid stardust under the strange twilight skies. But the peaceful exterior masked an ancient enigma, with eerie tales of explorers who had come seeking rest and never left.",
   },
   {
     icon: <PlanetLevel3 width={230} height={230} />,
     planetName: "Eclipsion",
-    planetDescription:
-      "a planet, shrouded in mystery — a world where the land was soft and rolling",
+    planetDescription: " a soft and fluffy world shrouded in mystery",
     story:
       "As your ship touched down on the velvety surface, the crew was greeted by a seemingly peaceful scene. Fluffy, pastel-colored cats with luminous eyes watched curiously from a distance. Their fur rippled in shades of brown, white, and peach, almost as if the planet’s strange energy flowed through them. But Captain Starling could feel it in the air—a tension, a secret buried beneath the calm. The crew soon discovered that these creatures weren’t just passive observers... ",
   },
@@ -113,16 +113,16 @@ function HomeScreen() {
 
   const level = LEVELS[currentLevel - 1];
   useEffect(() => {
-    Alert.alert(
-      "New Planet Reached!",
-      `Congratulations, you've reached the next level. It's time to explore the new planet!`,
-      [
-        {
-          text: "Close",
-          onPress: () => console.log("Close Pressed"),
-        },
-      ]
-    );
+    // Alert.alert(
+    //   "New Planet Reached!",
+    //   `Congratulations, you've reached the next level. It's time to explore the new planet!`,
+    //   [
+    //     {
+    //       text: "Close",
+    //       onPress: () => console.log("Close Pressed"),
+    //     },
+    //   ]
+    // );
   }, [currentLevel]);
 
   return (
@@ -197,6 +197,14 @@ function HomeScreen() {
               bottom: screenHeight * 0.1,
             }}>
             <ProgressStarsBackground />
+          </View>
+          <View
+            style={{
+              position: "absolute",
+              bottom: -deviceHeight / 3,
+              zIndex: -1,
+            }}>
+            <BackgroundStarsBig width={deviceWidth} height={deviceHeight} />
           </View>
           <Pressable
             android_ripple={{ radius: 2, color: Colors.primaryGrey }}
