@@ -71,6 +71,7 @@ function WeeklyAgenda({
 
   function editHabitHandler(habit) {
     onEditHabit(habit);
+    console.log("Editing habit" + habit);
     setModalVisible(false);
   }
 
@@ -154,7 +155,6 @@ function WeeklyAgenda({
 
   // Specify how each item should be rendered in the agenda
   const renderItems = (item, firstItemInDay) => {
-    console.log(selectedDate);
     return (
       <TouchableOpacity onPress={() => openEditModal(item)}>
         <HabitItem habit={item} day={selectedDate} />

@@ -187,11 +187,13 @@ function HabitItem({ habit, day }) {
     setIsHabitChecked(true);
     try {
       console.log("Checking habit... " + BACKEND_URL + "/habits/habitEntry");
-      const response = await axios.post(
-        BACKEND_URL + "/habits/habitEntry",
+      const response = await axios.patch(
+        `${BACKEND_URL}/habits/habitEntry/${habitEntryId}`,
         {
           habitId: habit._id,
-          day: day,
+          updates: {
+            isCompleted: true,
+          },
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -199,11 +201,6 @@ function HabitItem({ habit, day }) {
       );
 
       console.log(response.data);
-
-      const habitEntry = response.data.habitEntry;
-      console.log(habitEntry);
-      setHabitEntryId(habitEntry._id);
-
       const stats = response.data.stats;
       statsCtx.incrementStat(stats.updatedStat, stats.increment);
     } catch (error) {
@@ -216,8 +213,14 @@ function HabitItem({ habit, day }) {
     setIsHabitChecked(false);
     try {
       console.log(habit._id);
-      const response = await axios.delete(
-        BACKEND_URL + "/habits/habitEntry/" + habitEntryId,
+      const response = await axios.patch(
+        `${BACKEND_URL}/habits/habitEntry/${habitEntryId}`,
+        {
+          habitId: habit._id,
+          updates: {
+            isCompleted: false,
+          },
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -258,11 +261,30 @@ function HabitItem({ habit, day }) {
 
         console.log("Response entry._id: " + JSON.stringify(response.data._id));
         setHabitEntryId(response.data._id);
-        setIsHabitChecked(true);
+
+        setIsHabitChecked(response.data.isCompleted);
+        console.log(response.data.isCompleted);
       } catch (error) {
         if (error.response && error.response.status === 404) {
           // Handle 404 specifically
           console.log(`No habit entry for this day ${day}.`);
+          console.log("creating habit entry for day...");
+          try {
+            const response = await axios.post(
+              BACKEND_URL + "/habits/habitEntry",
+              {
+                habitId: habit._id,
+                day: day,
+              },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            console.log(response.data);
+            const habitEntry = response.data.habitEntry;
+            setHabitEntryId(habitEntry._id);
+          } catch (error) {}
         } else {
           // Handle other errors
           console.error("An error occurred:", error.message);

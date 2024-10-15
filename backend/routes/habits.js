@@ -10,7 +10,11 @@ router.get("/habitEntry", habitsController.getHabitEntry);
 
 router.post("/habitEntry", habitsController.postHabitEntry);
 
+router.patch("/habitEntry/:habitEntryId", habitsController.patchHabitEntry);
+
 router.delete("/habitEntry/:habitEntryId", habitsController.deleteHabitEntry);
+
+router.get("/habitCategories", habitsController.getHabitCategoriesForUser);
 
 router.get("/", habitsController.getHabits);
 

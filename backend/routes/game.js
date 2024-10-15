@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const isAth = require("../middleware/is-auth");
+const isAuth = require("../middleware/is-auth");
 const gameController = require("../controllers/game");
 
-router.use(isAth);
+router.use(isAuth);
 
 router.get("/progress", gameController.getUserProgress);
 

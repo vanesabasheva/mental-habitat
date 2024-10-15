@@ -7,8 +7,10 @@ export const StatsContext = createContext({
     grip: 0,
     fuel: 0,
   },
+  categories: [],
   incrementStat: () => {},
   setAllStats: () => {},
+  setAllCategories: () => {},
 });
 
 function StatsContextProvider({ children }) {
@@ -18,7 +20,7 @@ function StatsContextProvider({ children }) {
     fuel: 0,
     energy: 0,
   });
-
+  const [categories, setCategories] = useState([]);
   const incrementStat = (updatedStat, increment) => {
     console.log("In increment stat..." + updatedStat + increment);
     console.log("Before" + JSON.stringify(stats));
@@ -34,10 +36,16 @@ function StatsContextProvider({ children }) {
     setStats(newStats);
   };
 
+  const setAllCategories = (allCategories) => {
+    setCategories(allCategories);
+  };
+
   const value = {
     stats: stats,
+    categories: categories,
     incrementStat: incrementStat,
     setAllStats: setAllStats,
+    setAllCategories: setAllCategories,
   };
 
   return (

@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const DUMMY_HABITS = [
-  { title: "Stop Smoking", category: "Smoking" },
+  {
+    title: "Stop Smoking",
+    category: "Smoking",
+    details: { numberOfCigarettes: 5 },
+  },
   { title: "Eat a salad", category: "Diet" },
 ];
 

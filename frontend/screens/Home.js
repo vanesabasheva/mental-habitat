@@ -78,7 +78,8 @@ function HomeScreen() {
   /////////////////////////////////////////////
   // Initialize User Progress and stats (resources) //
   ////////////////////////////////////////////
-  const { stats, incrementStat, setAllStats } = useContext(StatsContext);
+  const { stats, categories, incrementStat, setAllStats, setAllCategories } =
+    useContext(StatsContext);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [levelProgress, setLevelProgress] = useState(0);
 
@@ -100,9 +101,25 @@ function HomeScreen() {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log("FETCHING CATEGORIES OF USER...");
+
+        const categoriesResponse = await axios.get(
+          `${BACKEND_URL}/habits/habitCategories`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(categoriesResponse.data);
+        const fetchedCategories = categoriesResponse.data.habitCategories;
+        console.log(fetchedCategories);
+        setAllCategories(fetchedCategories);
         setAllStats(response.data.stats);
         setLevelProgress(response.data.levelProgress);
         setCurrentLevel(response.data.currentLevel);
+
+        console.log(categories);
       } catch (error) {
         console.error("Error fetching stats:", error);
       }
@@ -176,6 +193,7 @@ function HomeScreen() {
           {/* {Engines} */}
           <ShipProgress
             stats={stats}
+            categories={categories}
             setLevelProgress={setLevelProgress}
             setCurrentLevel={setCurrentLevel}></ShipProgress>
         </View>

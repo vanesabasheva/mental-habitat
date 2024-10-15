@@ -142,7 +142,7 @@ exports.deleteHabit = async (req, res) => {
     const user = await User.findById(userId);
 
     user.habits = user.habits.filter((habit) => habit.toString() !== habitId);
-
+    // TODO: delete all habit entries of this habit
     await user.save();
     res.status(204).send();
   } catch (error) {
@@ -152,10 +152,8 @@ exports.deleteHabit = async (req, res) => {
 
 exports.postHabitEntry = async (req, res) => {
   const { habitId, day } = req.body;
-  const userId = req.user.userId;
-  try {
-    console.log(day);
 
+  try {
     if (!day || new Date(day).toString() === "Invalid Date") {
       console.log(day);
       return res.status(400).json({ message: "Invalid or missing date." });
@@ -167,7 +165,7 @@ exports.postHabitEntry = async (req, res) => {
         habitId: habitId,
         day: day,
       },
-      "Habit entry log for the day."
+      "New Habit entry for the day requested."
     );
 
     const entry = await HabitEntry.findOne({
@@ -184,6 +182,10 @@ exports.postHabitEntry = async (req, res) => {
         },
         "Habit already logged for today."
       );
+
+      // TODO: this is not an error potentially? if it exists then one should return the entry for further modification from frontend
+      // or redirect to a new function?
+      // or check if the habit is completed.
 
       return res
         .status(409)
@@ -205,49 +207,155 @@ exports.postHabitEntry = async (req, res) => {
     const normalizedDay = new Date(day);
     normalizedDay.setHours(0, 0, 0, 0);
 
+    let details = {};
+    switch (habit.category) {
+      case "Smoking":
+        details = {
+          numberOfSmokedCigarettes: 0,
+          numberOfCigarettes: habit.details.numberOfCigarettes,
+        };
+        break;
+      case "Exercise":
+        const distance = habit.details.distance ? habit.details.distance : null;
+        details = {
+          duration: habit.details.duration,
+          distance: distance,
+        };
+        break;
+      case "Alcohol":
+        details = {
+          numberOfConsumedDrinks: 0,
+          numberOfDrinks: habit.details.numberOfDrinks,
+        };
+        break;
+      case "Diet":
+        break;
+    }
+
     const newHabitEntry = await HabitEntry.create({
       habitId: habitId,
       day: normalizedDay,
-      //details: details ? details : null,
+      details: details,
     });
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      logger.warn(
-        {
-          action: "post_habit_entry",
-          habitId: habitId,
-        },
-        "User not found."
-      );
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const statsUpdate = await updateStats(habit.category, user, true);
-
-    if (statsUpdate.error) {
-      logger.warn(
-        {
-          action: "post_habit_entry",
-          habitId: habitId,
-        },
-        "Error occurred whilst updating stats."
-      );
-      return res.status(500).json(statsUpdate);
-    }
 
     logger.info(
       {
         action: "post_habit_entry",
         habitId: habitId,
         day: day,
+        details: details,
       },
-      "Habit entry log for the day successfully logged."
+      "Habit entry log for the day successfully created."
     );
-    res.status(201).json({ habitEntry: newHabitEntry, stats: statsUpdate });
+    res.status(201).json({ habitEntry: newHabitEntry });
   } catch (error) {
     handleError(res, error, "post_habit_entry");
+  }
+};
+
+exports.patchHabitEntry = async (req, res) => {
+  // STATS UPDATE ONLY ON isCompleted = true for the specific EntryID; i.e user has clicked the checkbox
+  // why not foreach habit today, create new habitEntry at the beginning of the day. the frontend then checks, habitNetry.isCompleted
+  // for completion of the habit
+  const userId = req.user.userId;
+  const { habitEntryId } = req.params;
+  const { habitId, updates } = req.body;
+  try {
+    const habitEntry = await HabitEntry.findById(habitEntryId);
+
+    if (!habitEntry) {
+      logger.warn(
+        {
+          action: "patch_habit_entry",
+          habitEntryId: habitId,
+        },
+        "Habit Entry not found."
+      );
+      return res.status(404).json({ message: "Habit Entry not found" });
+    }
+
+    // // check if the user is authorized to update this entry
+    // if (habitEntry.userId.toString() !== userId) {
+    //   return res.status(403).json({ message: "Unauthorized" });
+    // }
+
+    const habit = await Habit.findById(habitId);
+
+    if (!habit) {
+      logger.warn(
+        {
+          action: "patch_habit_entry",
+          habitId: habitId,
+        },
+        "Habit not found."
+      );
+      return res.status(404).json({ message: "Habit not found" });
+    }
+
+    if (updates.isCompleted !== undefined) {
+      habitEntry.isCompleted = updates.isCompleted; // update entry
+
+      const user = await User.findById(userId);
+      if (!user) {
+        logger.warn(
+          {
+            action: "post_habit_entry",
+            habitId: habitId,
+          },
+          "User not found."
+        );
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // increment stats only if isCompleted === true else decrement
+      let statsUpdate;
+      if (updates.isCompleted) {
+        statsUpdate = await updateStats(habit.category, user, true);
+      } else {
+        statsUpdate = await updateStats(habit.category, user, false);
+      }
+      if (statsUpdate.error) {
+        logger.warn(
+          {
+            action: "post_habit_entry",
+            habitId: habitId,
+          },
+          "Error occurred whilst updating stats."
+        );
+        return res.status(500).json(statsUpdate);
+      }
+
+      logger.info(
+        {
+          action: "patch_habit_entry",
+          habitId: habitId,
+          details: habitEntry.details,
+          isCompleted: habitEntry.isCompleted,
+          updates: updates.details,
+        },
+        "Habit entry log for the day successfully updated."
+      );
+      await habitEntry.save();
+      return res.status(200).json({ stats: statsUpdate });
+    }
+
+    if (updates) {
+      habitEntry.details = { ...habitEntry.details, ...updates };
+    }
+    console.log("Updates" + JSON.stringify(updates));
+    logger.info(
+      {
+        action: "patch_habit_entry",
+        habitId: habitId,
+        details: habitEntry.details,
+        updates: updates,
+      },
+      "Habit entry log for the day successfully updated."
+    );
+    await habitEntry.save();
+    res.status(200).json({ habitEntry: habitEntry });
+  } catch (error) {
+    handleError(res, error, "patch_habit_entry");
   }
 };
 
@@ -342,6 +450,36 @@ exports.deleteHabitEntry = async (req, res, next) => {
   }
 };
 
+exports.getHabitCategoriesForUser = async (req, res, next) => {
+  const userId = req.user.userId;
+  let stringUserId = userId.toString();
+  console.log(userId);
+  try {
+    const habitCategories = await Habit.aggregate([
+      {
+        $match: {
+          userId: mongoose.Types.ObjectId.createFromHexString(stringUserId),
+        },
+      },
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    console.log("IN HABIT CATEGORIES" + habitCategories);
+    logger.info(
+      {
+        action: "get_habit_ategiries",
+        user: userId,
+        habitCategories: habitCategories,
+      },
+      "Habit categories for user successfully fetched."
+    );
+    return res.status(200).json({ habitCategories: habitCategories });
+  } catch (error) {
+    handleError(res, error, "get_habit_categories");
+  }
+};
+
 ///////////////////////
 // Helper Functions //
 //////////////////////
@@ -356,7 +494,7 @@ async function updateStats(category, user, isIncrementing) {
     const applyIncrement = (currentValue, incrementValue) => {
       // Increment, but cap the value at 10
       const newValue = Math.min(currentValue + incrementValue, 10);
-      console.log("In Increment" + actualIncrement);
+
       actualIncrement = newValue - currentValue;
       return newValue;
     };
@@ -364,7 +502,7 @@ async function updateStats(category, user, isIncrementing) {
     const applyDecrement = (currentValue, decrementValue) => {
       const newValue = Math.max(currentValue - decrementValue, 0);
       actualIncrement = currentValue - newValue; // Negative because it's a decrement
-      console.log("In Decrement" + actualIncrement);
+
       return newValue;
     };
 
@@ -415,24 +553,7 @@ async function updateStats(category, user, isIncrementing) {
   }
 }
 
-async function getHabitCategoriesForUser(userId) {
-  try {
-    const habitCategories = await Habit.aggregate([
-      { $match: { userId: mongoose.Types.ObjectId(userId) } },
-      { $group: { _id: "$category", count: { $sum: 1 } } },
-      { $sort: { _id: 1 } },
-    ]);
-
-    return habitCategories;
-  } catch (error) {
-    return {
-      error: "Error fetching habit cateogries for user",
-      details: error.message,
-    };
-  }
-}
-
 function handleError(res, error, action) {
   logger.error({ error, action: action }, "An error occurred.");
-  res.status(500).json({ error: "Server error!" });
+  res.status(500).json({ error: "Server error!", error });
 }

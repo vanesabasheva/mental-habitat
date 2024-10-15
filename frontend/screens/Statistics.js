@@ -68,40 +68,6 @@ function StatisticsScreen() {
     //  { value: 2800, frontColor: "#3BE9DE", gradientColor: "#93FCF8" },
   ];
 
-  const smokingData = [
-    { value: 0, frontColor: Colors.primaryAlcohol, label: "Mo" },
-    {
-      value: 1,
-      frontColor: Colors.primarySmoking,
-      label: "Tu",
-    },
-    {
-      value: 3,
-      frontColor: Colors.primarySmoking,
-      label: "We",
-    },
-    {
-      value: 6,
-      frontColor: Colors.primarySmoking,
-      label: "Th",
-    },
-    {
-      value: 2,
-      frontColor: Colors.primarySmoking,
-      label: "Fr",
-    },
-    {
-      value: 6,
-      frontColor: Colors.primarySmoking,
-      label: "Sat",
-    },
-    {
-      value: 0,
-      frontColor: Colors.primarySmoking,
-      label: "Sun",
-    },
-  ];
-
   const alcoholData = [
     { value: 0, frontColor: Colors.primaryAlcohol, label: "Mo" },
     {
@@ -236,8 +202,8 @@ function StatisticsScreen() {
           <Text style={styles.headerText}>Your stats</Text>
         </View>
         <ScrollView>
+          <SmokingChart />
           <ExerciseChart data={data} />
-          <SmokingChart data={smokingData} />
           <AlcoholChart data={alcoholData} />
           <DietChart data={stackDietData} />
         </ScrollView>

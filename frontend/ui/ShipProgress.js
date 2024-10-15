@@ -13,7 +13,12 @@ import { useContext } from "react";
 import { AuthContext } from "../store/auth-context";
 const backendURL = BACKEND_URL + "/game";
 
-function ShipProgress({ stats, setCurrentLevel, setLevelProgress }) {
+function ShipProgress({
+  stats,
+  setCurrentLevel,
+  setLevelProgress,
+  categories,
+}) {
   const keysArray = Object.keys(stats);
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
@@ -22,8 +27,10 @@ function ShipProgress({ stats, setCurrentLevel, setLevelProgress }) {
   keysArray.forEach((key) => {
     progress += stats[key];
   });
+  console.log("In ship progress, categories forwarded...");
 
-  const isDisabled = progress < 40;
+  const isDisabled =
+    progress < categories.length * 10 || categories.length == 0;
 
   async function initiateMissionHandler() {
     try {
@@ -49,6 +56,16 @@ function ShipProgress({ stats, setCurrentLevel, setLevelProgress }) {
       console.log(error);
     }
   }
+  const isSmokingPresent = categories.some(
+    (category) => category._id === "Smoking"
+  );
+  const isExercisePresent = categories.some(
+    (category) => category._id === "Exercise"
+  );
+  const isAlcoholPresent = categories.some(
+    (category) => category._id === "Alcohol"
+  );
+  const isDietPresent = categories.some((category) => category._id === "Diet");
 
   return (
     <View style={{ alignItems: "center" }}>
@@ -86,18 +103,38 @@ function ShipProgress({ stats, setCurrentLevel, setLevelProgress }) {
         {/*Progress bar one*/}
 
         <View style={{ justifyContent: "space-around" }}>
-          {keysArray.map((item) => {
-            return (
-              <ProgressBar
-                key={item}
-                completedColor={Colors.primaryBold}
-                incompletedColor={Colors.primaryGrey}
-                percentage={stats[item] * 10}
-                isVertical={true}
-                gap={2}
-              />
-            );
-          })}
+          <ProgressBar
+            key="engine"
+            completedColor={Colors.primaryBold}
+            incompletedColor={Colors.primaryGrey}
+            percentage={isSmokingPresent ? stats["engines"] * 10 : 100}
+            isVertical={true}
+            gap={2}
+          />
+          <ProgressBar
+            key="grip"
+            completedColor={Colors.primaryBold}
+            incompletedColor={Colors.primaryGrey}
+            percentage={isDietPresent ? stats["grip"] * 10 : 100}
+            isVertical={true}
+            gap={2}
+          />
+          <ProgressBar
+            key="fuel"
+            completedColor={Colors.primaryBold}
+            incompletedColor={Colors.primaryGrey}
+            percentage={isAlcoholPresent ? stats["fuel"] * 10 : 100}
+            isVertical={true}
+            gap={2}
+          />
+          <ProgressBar
+            key="energy"
+            completedColor={Colors.primaryBold}
+            incompletedColor={Colors.primaryGrey}
+            percentage={isExercisePresent ? stats["energy"] * 10 : 100}
+            isVertical={true}
+            gap={2}
+          />
         </View>
       </View>
       <Button

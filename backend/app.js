@@ -50,6 +50,7 @@ const PORT = process.env.PORT || 3000;
 const userRoutes = require("./routes/users");
 const habitsRoutes = require("./routes/habits");
 const gameRoutes = require("./routes/game");
+const statisticsRoutes = require("./routes/statistics");
 
 /////////////
 // Routes //
@@ -57,6 +58,7 @@ const gameRoutes = require("./routes/game");
 app.use("/users", userRoutes); //Mount user routes at /users
 app.use("/habits", habitsRoutes);
 app.use("/game", gameRoutes);
+app.use("/statistics", statisticsRoutes);
 
 ////////////////////
 // Error handling //
