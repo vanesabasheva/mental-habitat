@@ -2,9 +2,8 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { Colors } from "../constants/Colors";
 import { BarChart } from "react-native-gifted-charts";
 import ExerciseChart from "../components/Statistics/ExerciseChart";
-import SmokingChart from "../components/Statistics/SmokingChart";
-import AlcoholChart from "../components/Statistics/AlcoholChart";
 import DietChart from "../components/Statistics/DietChart";
+import SubstanceChart from "../components/Statistics/SubstanceChartrt";
 
 function StatisticsScreen() {
   const data = [
@@ -66,40 +65,6 @@ function StatisticsScreen() {
       label: "13/09",
     },
     //  { value: 2800, frontColor: "#3BE9DE", gradientColor: "#93FCF8" },
-  ];
-
-  const alcoholData = [
-    { value: 0, frontColor: Colors.primaryAlcohol, label: "Mo" },
-    {
-      value: 1,
-      frontColor: Colors.primaryAlcohol,
-      label: "Tu",
-    },
-    {
-      value: 3,
-      frontColor: Colors.primaryAlcohol,
-      label: "We",
-    },
-    {
-      value: 6,
-      frontColor: Colors.primaryAlcohol,
-      label: "Th",
-    },
-    {
-      value: 2,
-      frontColor: Colors.primaryAlcohol,
-      label: "Fr",
-    },
-    {
-      value: 6,
-      frontColor: Colors.primaryAlcohol,
-      label: "Sat",
-    },
-    {
-      value: 0,
-      frontColor: Colors.primaryAlcohol,
-      label: "Sun",
-    },
   ];
 
   const stackDietData = [
@@ -202,9 +167,9 @@ function StatisticsScreen() {
           <Text style={styles.headerText}>Your stats</Text>
         </View>
         <ScrollView>
-          <SmokingChart />
+          <SubstanceChart mode="Smoking" />
+          <SubstanceChart mode="Alcohol" />
           <ExerciseChart data={data} />
-          <AlcoholChart data={alcoholData} />
           <DietChart data={stackDietData} />
         </ScrollView>
       </SafeAreaView>

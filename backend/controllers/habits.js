@@ -205,7 +205,7 @@ exports.postHabitEntry = async (req, res) => {
     }
 
     const normalizedDay = new Date(day);
-    normalizedDay.setHours(0, 0, 0, 0);
+    normalizedDay.setUTCHours(0, 0, 0, 0);
 
     let details = {};
     switch (habit.category) {

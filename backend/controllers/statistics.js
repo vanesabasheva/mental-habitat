@@ -39,15 +39,15 @@ exports.getSmokingStats = async (req, res) => {
       "Smoking entries for week requested."
     );
 
-    const totalSmokedCigarettes = smokingEntries.reduce(
-      (sum, entry) => sum + (entry.details.numberOfSmokedCigarettes || 0),
-      0
-    );
+    // const totalSmokedCigarettes = smokingEntries.reduce(
+    //   (sum, entry) => sum + (entry.details.numberOfSmokedCigarettes || 0),
+    //   0
+    // );
 
-    const totalGoal = smokingEntries.reduce(
-      (sum, entry) => sum + entry.numberOfCigarettes || 0,
-      0
-    );
+    // const totalGoal = smokingEntries.reduce(
+    //   (sum, entry) => sum + entry.numberOfCigarettes || 0,
+    //   0
+    // );
 
     let data = [];
 
@@ -58,18 +58,62 @@ exports.getSmokingStats = async (req, res) => {
         smokedCigarettes: element.details.numberOfSmokedCigarettes,
       };
     }
-
-    //
     // for each day index [{day: 0 smokedCigarettes: 0}, {day: 1, smokedCigarettes: 1}, {day: 2, smokedCigarettes: 4} ...]
-    //
-    //        {monthly: 12, 10, 10, 5 for each week of the month}
-    //        {yearly: 120, 120, 10, 100, 50, 30, 49, 90 ... for each month of the year}
-    // return average per day (totalSmokedCigarettes / (endDate - startDate))
-    //
-
     return res.status(200).json(data);
   } catch (error) {
     handleError(res, error, "get_smoking_stats");
+  }
+};
+
+exports.getAlcoholStats = async (req, res) => {
+  const userId = req.user.userId;
+  const action = "get_alcohol_stats";
+  const { startDate, endDate } = req.query;
+  const normalizedStartDate = new Date(startDate);
+  const normalizedEndDate = new Date(endDate);
+  normalizedStartDate.setUTCHours(0, 0, 0, 0);
+  normalizedEndDate.setUTCHours(0, 0, 0, 0);
+  try {
+    logger.info({ action: action, userId: userId }, "Alcohol stats requested.");
+    // Find all smoking-related habits for the user
+    const alcoholHabit = await Habit.findOne({ userId, category: "Alcohol" });
+
+    if (!alcoholHabit) {
+      return res.status(404).json({ message: "No alcohol habits found" });
+    }
+
+    const alcoholEntries = await HabitEntry.find({
+      habitId: alcoholHabit._id,
+      day: {
+        $gte: normalizedStartDate,
+        $lte: normalizedEndDate,
+      },
+    });
+
+    logger.info(
+      {
+        action: action,
+        userId: userId,
+        startDate: startDate,
+        endDate: endDate,
+        alcoholEntries: alcoholEntries,
+      },
+      "Alcohol entries for week requested."
+    );
+
+    let data = [];
+
+    for (let index = 0; index < alcoholEntries.length; index++) {
+      const element = alcoholEntries[index];
+      data[index] = {
+        day: index,
+        numberOfConsumedDrinks: element.details.numberOfConsumedDrinks,
+      };
+    }
+
+    return res.status(200).json(data);
+  } catch (error) {
+    handleError(res, error, action);
   }
 };
 

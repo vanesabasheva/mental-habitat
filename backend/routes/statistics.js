@@ -7,6 +7,6 @@ router.use(isAuth);
 
 router.get("/smoking", statisticsController.getSmokingStats);
 
-//router.get("/alcohol", statisticsController.getAlcoholStats);
+router.get("/alcohol", statisticsController.getAlcoholStats);
 
 module.exports = router;

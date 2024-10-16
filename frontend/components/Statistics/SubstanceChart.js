@@ -6,8 +6,9 @@ import { useState, useEffect, useContext } from "react";
 import { BACKEND_URL } from "@env";
 import axios from "axios";
 import { AuthContext } from "../../store/auth-context";
-const backendUrl = BACKEND_URL + "/statistics/smoking";
-const smokingData = [
+const backendUrl = BACKEND_URL + "/statistics";
+
+const dummy_data = [
   { value: 0, frontColor: Colors.primaryAlcohol, label: "Mo" },
   {
     value: 1,
@@ -41,13 +42,13 @@ const smokingData = [
   },
 ];
 
-function SmokingChart() {
-  const [chartData, setChartData] = useState(smokingData);
+function SubstanceChart({ mode }) {
+  const [chartData, setChartData] = useState(dummy_data);
   const [timePeriod, setTimePeriod] = useState("week");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentEndDate, setCurrentEndDate] = useState(new Date());
   const [average, setAverage] = useState(0);
-  const [smokeFreeDays, setSmokeFreeDays] = useState(0);
+  const [substanceFreeDays, setSubstanceFreeDays] = useState(0);
 
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
@@ -91,7 +92,9 @@ function SmokingChart() {
         startDate: startDate,
         endDate: endDate,
       };
-      const response = await axios.get(backendUrl, {
+
+      const ending = mode === "Smoking" ? "/smoking" : "/alcohol";
+      const response = await axios.get(backendUrl + ending, {
         params: params,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -105,27 +108,37 @@ function SmokingChart() {
 
   const processWeeklyData = (data) => {
     const days = ["Mo", "Tu", "We", "Th", "Fr", "Sat", "Sun"];
+    const frontColor =
+      mode === "Smoking" ? Colors.primarySmoking : Colors.primaryAlcohol;
 
     let barData = days.map((label) => ({
       label,
       value: 0,
-      frontColor: Colors.primarySmoking,
+      frontColor: frontColor,
     }));
 
-    let totalCigarettes = 0;
-    let noSmokeDays = 0;
+    let totalConsumption = 0;
+    let noSubstanceDays = 0;
 
-    data.forEach((element) => {
-      const dayIndex = element.day;
-      barData[dayIndex].value = element.smokedCigarettes;
-      totalCigarettes += element.smokedCigarettes;
-      console.log("SMOKED CIGARETTES " + element.smokedCigarettes);
-      if (element.smokedCigarettes === 0) noSmokeDays += 1;
-    });
+    if (mode === "Smoking") {
+      data.forEach((element) => {
+        const dayIndex = element.day;
+        barData[dayIndex].value = element.smokedCigarettes;
+        totalConsumption += element.smokedCigarettes;
+        if (element.smokedCigarettes === 0) noSubstanceDays += 1;
+      });
+    } else {
+      data.forEach((element) => {
+        const dayIndex = element.day;
+        barData[dayIndex].value = element.numberOfConsumedDrinks;
+        totalConsumption += element.numberOfConsumedDrinks;
+        if (element.numberOfConsumedDrinks === 0) noSubstanceDays += 1;
+      });
+    }
 
-    let newAverage = (totalCigarettes / 7).toFixed(1);
+    let newAverage = (totalConsumption / 7).toFixed(0);
     setAverage(newAverage);
-    setSmokeFreeDays(noSmokeDays);
+    setSubstanceFreeDays(noSubstanceDays);
     return barData;
   };
 
@@ -163,6 +176,9 @@ function SmokingChart() {
     );
   };
 
+  const activeColor =
+    mode === "Smoking" ? "rgba(208,235,255, 0.3)" : "rgba(255,201,201,0.3)";
+
   return (
     <View
       style={{
@@ -178,7 +194,7 @@ function SmokingChart() {
           fontWeight: "bold",
           marginBottom: 12,
         }}>
-        Smoking
+        {mode}
       </Text>
 
       <View
@@ -187,14 +203,14 @@ function SmokingChart() {
           marginBottom: 20,
           padding: 18,
           borderRadius: 20,
-          backgroundColor: "rgba(208,235,255, 0.3)",
+          backgroundColor: activeColor,
         }}>
         <Text
           style={{
             fontFamily: "robotomono-bold",
             fontSize: 16,
           }}>
-          No cigarettes for
+          No {mode === "Smoking" ? "cigarettes" : "alcohol"} for
         </Text>
         <Text
           style={{
@@ -203,7 +219,7 @@ function SmokingChart() {
             fontFamily: "robotomono-bold",
             color: Colors.primaryText,
           }}>
-          {smokeFreeDays} days
+          {substanceFreeDays} days
         </Text>
       </View>
 
@@ -226,7 +242,7 @@ function SmokingChart() {
                 fontFamily: "robotomono-regular",
                 marginBottom: 12,
               }}>
-              {average} cigarettes/day
+              {average} {mode === "Smoking" ? "cigarettes" : "drinks"}/day
             </Text>
           </View>
         </View>
@@ -305,4 +321,4 @@ function SmokingChart() {
   );
 }
 
-export default SmokingChart;
+export default SubstanceChart;
