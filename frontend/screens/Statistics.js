@@ -3,7 +3,7 @@ import { Colors } from "../constants/Colors";
 import { BarChart } from "react-native-gifted-charts";
 import ExerciseChart from "../components/Statistics/ExerciseChart";
 import DietChart from "../components/Statistics/DietChart";
-import SubstanceChart from "../components/Statistics/SubstanceChartrt";
+import SubstanceChart from "../components/Statistics/SubstanceChart";
 
 function StatisticsScreen() {
   const data = [
