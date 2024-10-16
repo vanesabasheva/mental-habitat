@@ -183,13 +183,9 @@ exports.postHabitEntry = async (req, res) => {
         "Habit already logged for today."
       );
 
-      // TODO: this is not an error potentially? if it exists then one should return the entry for further modification from frontend
-      // or redirect to a new function?
-      // or check if the habit is completed.
-
       return res
-        .status(409)
-        .json({ message: "Habit already logged for today" });
+        .status(200)
+        .json({ message: "Habit already logged for today", habitEntry: entry });
     }
 
     const habit = await Habit.findById(habitId);
@@ -229,6 +225,9 @@ exports.postHabitEntry = async (req, res) => {
         };
         break;
       case "Diet":
+        details = {
+          habitType: habit.details.habitType,
+        };
         break;
     }
 
@@ -372,7 +371,7 @@ exports.getHabitEntry = async (req, res) => {
     );
 
     const normalizedDay = new Date(day);
-    normalizedDay.setHours(0, 0, 0, 0);
+    normalizedDay.setUTCHours(0, 0, 0, 0);
 
     const habitEntry = await HabitEntry.findOne({
       habitId: habitId,

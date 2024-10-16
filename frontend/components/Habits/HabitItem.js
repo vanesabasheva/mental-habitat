@@ -259,11 +259,8 @@ function HabitItem({ habit, day }) {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("Response entry._id: " + JSON.stringify(response.data._id));
         setHabitEntryId(response.data._id);
-
         setIsHabitChecked(response.data.isCompleted);
-        console.log(response.data.isCompleted);
       } catch (error) {
         if (error.response && error.response.status === 404) {
           // Handle 404 specifically

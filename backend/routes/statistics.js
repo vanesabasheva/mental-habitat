@@ -9,4 +9,8 @@ router.get("/smoking", statisticsController.getSmokingStats);
 
 router.get("/alcohol", statisticsController.getAlcoholStats);
 
+router.get("/exercise", statisticsController.getExerciseStats);
+
+router.get("/diet", statisticsController.getDietStats);
+
 module.exports = router;

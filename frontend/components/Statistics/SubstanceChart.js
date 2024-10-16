@@ -219,7 +219,7 @@ function SubstanceChart({ mode }) {
             fontFamily: "robotomono-bold",
             color: Colors.primaryText,
           }}>
-          {substanceFreeDays} days
+          {substanceFreeDays} {substanceFreeDays === 1 ? "day" : "days"}
         </Text>
       </View>
 
@@ -315,6 +315,18 @@ function SubstanceChart({ mode }) {
               onPress={nextWeek}
             />
           </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            //marginTop: 12,
+            //marginHorizontal: 10,
+          }}>
+          <Text style={{ fontSize: 11, color: "gray" }}>Prev week</Text>
+          <Text style={{ fontSize: 11, color: "gray" }}>Next week</Text>
         </View>
       </View>
     </View>
