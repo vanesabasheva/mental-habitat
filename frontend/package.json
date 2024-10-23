@@ -41,7 +41,8 @@
     "react-native-select-week-day": "^0.0.6",
     "react-native-svg": "15.2.0",
     "react-native-swipe-list-view": "^3.2.9",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "expo-notifications": "~0.28.19"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

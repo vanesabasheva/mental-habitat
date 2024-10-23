@@ -185,7 +185,6 @@ function HabitsScreen() {
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           onDeleteHabit={deleteHabitHandler}
-          onEditHabit={editHabitHandler}
         />
       </SafeAreaView>
     </>

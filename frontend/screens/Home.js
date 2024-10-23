@@ -36,7 +36,7 @@ const screenHeight = Dimensions.get("window").height;
 import { BACKEND_URL } from "@env";
 const backendURL = BACKEND_URL + "/game";
 
-const LEVELS = [
+export const LEVELS = [
   {
     icon: <PlanetLevel1 width={200} height={200} />,
     planetName: "KP403",
@@ -78,9 +78,16 @@ function HomeScreen() {
   /////////////////////////////////////////////
   // Initialize User Progress and stats (resources) //
   ////////////////////////////////////////////
-  const { stats, categories, incrementStat, setAllStats, setAllCategories } =
-    useContext(StatsContext);
-  const [currentLevel, setCurrentLevel] = useState(1);
+  const {
+    stats,
+    categories,
+    incrementStat,
+    setAllStats,
+    setAllCategories,
+    currentLevel,
+    setCurrentLevel,
+  } = useContext(StatsContext);
+  // const [currentLevel, setCurrentLevel] = useState(1);
   const [levelProgress, setLevelProgress] = useState(0);
 
   // Spaceship params //
@@ -198,7 +205,7 @@ function HomeScreen() {
             setCurrentLevel={setCurrentLevel}></ShipProgress>
         </View>
 
-        <View style={{ alignSelf: "flex-end", zIndex: 10 }}>
+        <View style={{ alignSelf: "flex-end", zIndex: 1 }}>
           <GreyPlanet width={150} height={150} />
         </View>
 
@@ -243,6 +250,7 @@ function HomeScreen() {
               position: "absolute",
               left: screenWidth * 0.5,
               bottom: screenHeight * 0.18,
+              zIndex: 10,
             }}>
             <ProgressBar
               percentage={levelProgress}
@@ -250,6 +258,7 @@ function HomeScreen() {
               incompletedColor={Colors.primaryGrey}
               stepStyle={{ transform: [{ rotate: "90deg" }] }}
               gap={15}
+              ship={true}
             />
           </View>
         </View>

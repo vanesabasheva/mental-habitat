@@ -9,6 +9,7 @@ function DrawerNav() {
     <Drawer.Navigator>
       <Drawer.Screen name="Feed" component={HomeScreen} />
       <Drawer.Screen name="Article" component={HabitsScreen} />
+      <Drawer.Screen name="Achievements" component={Achievements} />
     </Drawer.Navigator>
   );
 }

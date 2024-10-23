@@ -111,8 +111,6 @@ function DietChart() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("FETCHED Diet DATA" + JSON.stringify(response.data));
-
       return processWeeklyData(response.data);
     } catch (error) {
       console.log(error);

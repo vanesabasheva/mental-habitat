@@ -136,7 +136,7 @@ function SubstanceChart({ mode }) {
       });
     }
 
-    let newAverage = (totalConsumption / 7).toFixed(0);
+    let newAverage = (totalConsumption / 7).toFixed(1);
     setAverage(newAverage);
     setSubstanceFreeDays(noSubstanceDays);
     return barData;

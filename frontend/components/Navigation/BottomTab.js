@@ -8,6 +8,7 @@ import DrawerNav from "./Drawer";
 import MessagesScreen from "../../screens/Messages";
 import Settings from "../../screens/Settings";
 import StatisticsScreen from "../../screens/Statistics";
+import Achievements from "../../screens/Achievements";
 
 const screenWidth = Dimensions.get("window").width;
 const iconSize = screenWidth * 0.08; // 9% of screen width
@@ -56,7 +57,7 @@ function BottomTab() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Habits" component={HabitsScreen} />
       <Tab.Screen name="Statistics" component={StatisticsScreen} />
-      <Tab.Screen name="Messages" component={MessagesScreen} />
+      {/* <Tab.Screen name="Messages" component={MessagesScreen} /> */}
       <Tab.Screen name="Drawer" component={Settings} />
     </Tab.Navigator>
   );
