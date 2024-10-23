@@ -14,8 +14,10 @@ function NewAlcoholHabitForm({ habit, buttonLabel, onAddNewHabit }) {
 
   useEffect(() => {
     if (habit) {
+      console.log("Mode Edit: " + JSON.stringify(habit));
+      console.log("Selected days: " + habit.selectedDaysOfWeek);
       setTitle(habit.title);
-      setNumberOfDrinks(habit.numberOfDrinks);
+      setNumberOfDrinks(habit.details.numberOfDrinks);
     }
   }, [habit]);
 

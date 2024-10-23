@@ -34,10 +34,12 @@ function NewDietHabitForm({ habit, onAddNewHabit, buttonLabel }) {
 
   useEffect(() => {
     if (habit) {
+      console.log("Mode Edit: " + JSON.stringify(habit));
+      console.log("Selected days: " + habit.selectedDaysOfWeek);
       const indices = habit.selectedDaysOfWeek.map((day) => dayIndices[day]);
+      console.log(indices);
       setTitle(habit.title);
-      setHabitType(habit.habitType);
-      setSelectedDays(indices);
+      setHabitType(habit.details.habitType);
     }
   }, [habit]);
 

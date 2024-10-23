@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Colors } from "../../../constants/Colors";
 //import Button from "../../../ui/Button";
 
 export const WEEK_DAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
-function SelectWeekDays({ onChange }) {
+function SelectWeekDays({ onChange, setDays }) {
   let days = [];
   const [selectedDays, setSelectedDays] = useState(days);
 

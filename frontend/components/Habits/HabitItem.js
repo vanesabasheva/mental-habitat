@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Colors } from "../../constants/Colors";
 import Checkbox from "react-native-community-checkbox";
 import SmokingIcon from "../../assets/svgs/HabitsIcons/SmokingIcon.svg";
@@ -10,29 +10,40 @@ import WeightliftingIcon from "../../assets/svgs/HabitsIcons/WeightliftingIcon.s
 import RunningIcon from "../../assets/svgs/HabitsIcons/RunningIcon.svg";
 import AlcoholIcon from "../../assets/svgs/HabitsIcons/AlcoholIcon.svg";
 import DietIcon from "../../assets/svgs/HabitsIcons/DietIcon.svg";
+import IconButton from "../../ui/ButtonIcon";
 import { useContext, useState, useEffect } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { deviceWidth } from "../../constants/Dimensions";
 import { AuthContext } from "../../store/auth-context";
 import { StatsContext } from "../../store/stats-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from "axios";
 import { BACKEND_URL } from "@env";
+import CustomModal from "../../ui/Modal";
+import NewAlcoholHabitForm from "../Habits/NewHabit/FormAlcohol";
+import NewExerciseHabitForm from "../Habits/NewHabit/FormExercise";
+import NewSmokingHabitForm from "../Habits/NewHabit/FormSmoking";
+import NewDietHabitForm from "../Habits/NewHabit/FormDiet";
+import { deviceWidth, deviceHeight } from "../../constants/Dimensions";
+import SubstanceHabitLog from "./LogHabit/SubstanceHabitLog";
+import DietHabitLog from "./LogHabit/DietHabitLog";
+import ExerciseHabitLog from "./LogHabit/ExerciseHabitLog";
 
-function HabitItem({ habit, day }) {
-  const { title, details, habitType, selectedDaysOfWeek, category } = habit;
+function HabitItem({ habit, day, onDeleteHabit }) {
+  const { _id, title, details, habitType, selectedDaysOfWeek, category } =
+    habit;
   const { numberOfCigarettes, duration, distance, numberOfDrinks } = details;
   const authCtx = useContext(AuthContext);
   const statsCtx = useContext(StatsContext);
   const [isHabitChecked, setIsHabitChecked] = useState(false);
   const [habitEntryId, setHabitEntryId] = useState();
+  const [habitEntry, setHabitEntry] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [logModalVisible, setLogModalVisible] = useState(false);
   const token = authCtx.token;
 
   let descriptionBasedOnCategory;
   let habitCategoryColor;
-  let buttonCategoryColorGreyed = Colors.primaryGrey;
-  let buttonCategoryColor = Colors.primaryBold;
   let icon;
-  let checkedTextStyle;
+  let checkedTextStyle = "grey";
 
   if (isHabitChecked) {
     checkedTextStyle = { color: "#999" };
@@ -234,7 +245,6 @@ function HabitItem({ habit, day }) {
     }
   };
 
-  // Function to toggle the checked state
   const toggleCheckbox = () => {
     if (isHabitChecked) {
       handleUncheck();
@@ -244,11 +254,6 @@ function HabitItem({ habit, day }) {
   };
 
   useEffect(() => {
-    console.log(
-      "Fetching log for the day initiated..." +
-        BACKEND_URL +
-        "/habits/habitEntry"
-    );
     const fetchHabitEntryForDay = async () => {
       try {
         const response = await axios.get(BACKEND_URL + "/habits/habitEntry", {
@@ -259,13 +264,16 @@ function HabitItem({ habit, day }) {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setHabitEntryId(response.data._id);
-        setIsHabitChecked(response.data.isCompleted);
+        //TODO: optimize setting of properties in states, one state is enough
+        const habitEntry = response.data;
+        setHabitEntryId(habitEntry._id);
+        setHabitEntry(habitEntry);
+        setIsHabitChecked(habitEntry.isCompleted);
       } catch (error) {
         if (error.response && error.response.status === 404) {
           // Handle 404 specifically
           console.log(`No habit entry for this day ${day}.`);
-          console.log("creating habit entry for day...");
+          console.log("Creating habit entry for day...");
           try {
             const response = await axios.post(
               BACKEND_URL + "/habits/habitEntry",
@@ -280,6 +288,7 @@ function HabitItem({ habit, day }) {
 
             console.log(response.data);
             const habitEntry = response.data.habitEntry;
+            setHabitEntry(habitEntry);
             setHabitEntryId(habitEntry._id);
           } catch (error) {}
         } else {
@@ -292,38 +301,233 @@ function HabitItem({ habit, day }) {
     fetchHabitEntryForDay();
   }, []);
 
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  function openLogModal() {
+    setLogModalVisible(true);
+  }
+
+  ///////////////////////////////////////////////
+  // Set the EDIT & LOG HABIT FORM based on category //
+  ///////////////////////////////////////////////
+  let habitForm;
+  let logHabitForm;
+  if (habit) {
+    switch (habit.category) {
+      case "Smoking":
+        habitForm = (
+          <NewSmokingHabitForm
+            buttonLabel="Update Habit"
+            habit={habit}
+            onAddNewHabit={editHabitHandler}
+          />
+        );
+        logHabitForm = (
+          <SubstanceHabitLog
+            habitEntry={habitEntry}
+            mode="Smoking"
+            onLog={updateHabitEntry}
+          />
+        );
+        break;
+
+      case "Exercise":
+        habitForm = (
+          <NewExerciseHabitForm
+            buttonLabel="Update Habit"
+            habit={habit}
+            onAddNewHabit={editHabitHandler}
+          />
+        );
+
+        logHabitForm = (
+          <ExerciseHabitLog habitEntry={habitEntry} onLog={updateHabitEntry} />
+        );
+
+        break;
+
+      case "Alcohol":
+        habitForm = (
+          <NewAlcoholHabitForm
+            buttonLabel="Update Habit"
+            habit={habit}
+            onAddNewHabit={editHabitHandler}
+          />
+        );
+        logHabitForm = (
+          <SubstanceHabitLog
+            habitEntry={habitEntry}
+            mode="Alcohol"
+            onLog={updateHabitEntry}
+          />
+        );
+        break;
+
+      case "Diet":
+        habitForm = (
+          <NewDietHabitForm
+            buttonLabel="Update Habit"
+            habit={habit}
+            onAddNewHabit={editHabitHandler}
+          />
+        );
+        logHabitForm = (
+          <DietHabitLog habitEntry={habitEntry} onLog={updateHabitEntry} />
+        );
+
+        break;
+      default:
+        habitForm = <Text>Invalid Habit Category</Text>;
+        break;
+    }
+  }
+
+  async function deleteHabitHandler(id) {
+    onDeleteHabit(id);
+    setModalVisible(false);
+  }
+
+  async function editHabitHandler(habit) {
+    const { ...updateData } = habit;
+    console.log("Starting editing habit..." + JSON.stringify(updateData));
+    console.log(habit._id);
+    try {
+      const response = await axios.put(
+        `${BACKEND_URL}/habits/${_id}`,
+
+        updateData,
+
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("Update Successful", response.data);
+    } catch (error) {
+      console.error("Failed to update habit", error);
+    }
+    console.log("Editing habit" + JSON.stringify(habit));
+    setModalVisible(false);
+  }
+
+  async function updateHabitEntry(details) {
+    console.log(details);
+    try {
+      const response = await axios.patch(
+        `${BACKEND_URL}/habits/habitEntry/${habitEntryId}`,
+        {
+          habitId: habit._id,
+          updates: details,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log(response.data);
+      setHabitEntry(response.data.habitEntry);
+      setLogModalVisible(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
-    <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>
-      <View style={[styles.container, { backgroundColor: habitCategoryColor }]}>
-        <View>{icon}</View>
-        <View style={{ gap: 8, maxWidth: "40%" }}>
-          <View>
-            <Text style={[styles.title, checkedTextStyle]}>{title}</Text>
-            {descriptionBasedOnCategory}
-          </View>
-        </View>
-        <View style={styles.container}>
-          {/* <IconButton
-            icon="add-circle"
-            size={34}
-            color={buttonCategoryColor}
-            onPress={onLogHabit}
-          /> */}
-          {isHabitChecked ? (
-            <View style={{ position: "absolute", right: deviceWidth * 0.06 }}>
-              <Ionicons name="checkmark-outline" size={12} color="black" />
-            </View>
-          ) : null}
-          <View style={{ borderRadius: 50, overflow: "hidden" }}>
-            <Checkbox
-              isChecked={isHabitChecked}
-              setChecked={toggleCheckbox}
-              styles={stylesCheckbox}
+    <TouchableOpacity onPress={() => openLogModal(habit)}>
+      <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>
+        <View
+          style={[styles.container, { backgroundColor: habitCategoryColor }]}>
+          <View
+            style={{
+              position: "absolute",
+              padding: 10,
+              top: 18,
+              borderRadius: 50,
+            }}>
+            <IconButton
+              icon="create-outline"
+              size={24}
+              color={isHabitChecked ? Colors.primaryGrey : "grey"}
+              onPress={openModal}
             />
           </View>
+          <View style={{ marginLeft: 32 }}>{icon}</View>
+          <View style={{ gap: 8, maxWidth: "40%" }}>
+            <View>
+              <Text style={[styles.title, checkedTextStyle]}>{title}</Text>
+              {descriptionBasedOnCategory}
+            </View>
+          </View>
+          <View style={styles.container}>
+            {isHabitChecked ? (
+              <View style={{ position: "absolute", right: deviceWidth * 0.06 }}>
+                <Ionicons name="checkmark-outline" size={12} color="black" />
+              </View>
+            ) : null}
+            <View style={{ borderRadius: 50, overflow: "hidden" }}>
+              <Checkbox
+                isChecked={isHabitChecked}
+                setChecked={toggleCheckbox}
+                styles={stylesCheckbox}
+              />
+            </View>
+          </View>
         </View>
+
+        {/* EDIT HABIT MODAL */}
+        <CustomModal
+          title={"Edit habit"}
+          description={"Try to frame your habit as a small achievable action "}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              gap: deviceHeight * 0.025,
+            }}>
+            {icon}
+            {habitForm}
+            <IconButton
+              icon={"trash"}
+              color={Colors.primaryBold}
+              size={24}
+              onPress={() => {
+                deleteHabitHandler(habit._id);
+              }}
+            />
+          </View>
+        </CustomModal>
+
+        {/* LOG HABIT MODAL */}
+        <CustomModal
+          title={"Habit Log"}
+          description={habit.title}
+          modalVisible={logModalVisible}
+          setModalVisible={setLogModalVisible}>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              gap: deviceHeight * 0.025,
+            }}>
+            <View
+              style={{
+                backgroundColor: Colors.primaryBackgroundLight,
+                width: deviceWidth * 0.7,
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 20,
+                borderRadius: 32,
+              }}>
+              {icon}
+            </View>
+            {logHabitForm}
+          </View>
+        </CustomModal>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

@@ -1,32 +1,15 @@
 import { Agenda } from "react-native-calendars";
-import {
-  View,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, SafeAreaView, StyleSheet } from "react-native";
 import { Colors } from "../../constants/Colors";
 import HabitItem from "../Habits/HabitItem";
-import { useState } from "react";
-import CustomModal from "../../ui/Modal";
-import NewAlcoholHabitForm from "../Habits/NewHabit/FormAlcohol";
-import NewExerciseHabitForm from "../Habits/NewHabit/FormExercise";
-import NewSmokingHabitForm from "../Habits/NewHabit/FormSmoking";
-import NewDietHabitForm from "../Habits/NewHabit/FormDiet";
-import IconButton from "../../ui/ButtonIcon";
-import { deviceHeight, deviceWidth } from "../../constants/Dimensions";
-import SmokingIcon from "../../assets/svgs/HabitsIcons/SmokingIcon.svg";
-import WorkoutIcon from "../../assets/svgs/HabitsIcons/WorkoutIcon.svg";
-import AlcoholIcon from "../../assets/svgs/HabitsIcons/AlcoholIcon.svg";
-import DietIcon from "../../assets/svgs/HabitsIcons/DietIcon.svg";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { deviceHeight } from "../../constants/Dimensions";
 
 function WeeklyAgenda({
   habitsForDate,
   selectedDate,
   setSelectedDate,
   onDeleteHabit,
-  onEditHabit,
 }) {
   const CALENDAR_THEME = {
     calendarBackground: Colors.primaryBackgroundLight,
@@ -56,99 +39,25 @@ function WeeklyAgenda({
     agendaKnobColor: Colors.primaryGrey,
   };
 
-  const [currentHabit, setCurrentHabit] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-
   // Specify how each date should be rendered. day can be undefined if the item is not first in that day
   const renderEmptyDay = () => {
     return <View styles={{ backgroundColor: Colors.primaryBackgroundLight }} />;
   };
 
-  function openEditModal(habit) {
-    setCurrentHabit(habit);
-    setModalVisible(true);
-  }
-
   function editHabitHandler(habit) {
     onEditHabit(habit);
     console.log("Editing habit" + habit);
-    setModalVisible(false);
   }
 
   async function deleteHabitHandler(id) {
     onDeleteHabit(id);
-    setModalVisible(false);
-  }
-
-  ///////////////////////////////////////////////
-  // Set the EDIT HABIT FORM based on category //
-  ///////////////////////////////////////////////
-  let habitForm;
-  let icon;
-  if (currentHabit) {
-    switch (currentHabit.category) {
-      case "Smoking":
-        habitForm = (
-          <NewSmokingHabitForm
-            buttonLabel="Update Habit"
-            habit={currentHabit}
-            onAddNewHabit={editHabitHandler}
-          />
-        );
-        icon = (
-          <SmokingIcon width={deviceWidth * 0.2} height={deviceWidth * 0.2} />
-        );
-        break;
-
-      case "Exercise":
-        habitForm = (
-          <NewExerciseHabitForm
-            buttonLabel="Update Habit"
-            habit={currentHabit}
-            onAddNewHabit={editHabitHandler}
-          />
-        );
-        icon = (
-          <WorkoutIcon width={deviceWidth * 0.2} height={deviceWidth * 0.2} />
-        );
-        break;
-
-      case "Alcohol":
-        habitForm = (
-          <NewAlcoholHabitForm
-            buttonLabel="Update Habit"
-            habit={currentHabit}
-            onAddNewHabit={editHabitHandler}
-          />
-        );
-        icon = (
-          <AlcoholIcon width={deviceWidth * 0.25} height={deviceWidth * 0.25} />
-        );
-        break;
-
-      case "Diet":
-        habitForm = (
-          <NewDietHabitForm
-            buttonLabel="Update Habit"
-            habit={currentHabit}
-            onAddNewHabit={editHabitHandler}
-          />
-        );
-        icon = (
-          <DietIcon width={deviceWidth * 0.2} height={deviceWidth * 0.2} />
-        );
-        break;
-      default:
-        habitForm = <Text>Invalid Habit Category</Text>;
-        break;
-    }
   }
 
   //returns card for empty slots.
   const renderEmptyItem = () => {
     return (
       <View style={styles.container}>
-        <Text>No habits for today</Text>
+        <Ionicons name="sunny-outline" size={24} color={Colors.primaryGrey} />
       </View>
     );
   };
@@ -156,9 +65,11 @@ function WeeklyAgenda({
   // Specify how each item should be rendered in the agenda
   const renderItems = (item, firstItemInDay) => {
     return (
-      <TouchableOpacity onPress={() => openEditModal(item)}>
-        <HabitItem habit={item} day={selectedDate} />
-      </TouchableOpacity>
+      <HabitItem
+        habit={item}
+        day={selectedDate}
+        onDeleteHabit={deleteHabitHandler}
+      />
     );
   };
 
@@ -191,29 +102,6 @@ function WeeklyAgenda({
           }}
         />
       </View>
-      <CustomModal
-        title={"Edit habit"}
-        description={"Try to frame your habit as a small achievable action "}
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            gap: deviceHeight * 0.025,
-          }}>
-          {icon}
-          {habitForm}
-          <IconButton
-            icon={"trash"}
-            color={Colors.primaryBold}
-            size={24}
-            onPress={() => {
-              deleteHabitHandler(currentHabit._id);
-            }}
-          />
-        </View>
-      </CustomModal>
     </SafeAreaView>
   );
 }

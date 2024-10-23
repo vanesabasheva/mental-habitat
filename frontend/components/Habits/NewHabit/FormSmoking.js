@@ -14,8 +14,7 @@ function NewSmokingHabitForm({ habit, buttonLabel, onAddNewHabit }) {
   useEffect(() => {
     if (habit) {
       setTitle(habit.title);
-      console.log(JSON.stringify(habit));
-      setNumberOfCigarettes(habit.numberOfCigarettes);
+      setNumberOfCigarettes(habit.details.numberOfCigarettes);
     }
   }, [habit]);
 

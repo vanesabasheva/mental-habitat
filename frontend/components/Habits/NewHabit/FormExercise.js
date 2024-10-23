@@ -42,8 +42,8 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
   useEffect(() => {
     if (habit) {
       setSelectedActivity(habit.title);
-      setDuration(habit.duration);
-      habit.distance ? setDistance(habit.distance) : "";
+      setDuration(habit.details.duration);
+      habit.details.distance ? setDistance(habit.details.distance) : "";
     }
   }, [habit]);
 
@@ -74,7 +74,7 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
     if (Object.values(newErrors).some((error) => error !== null)) {
       return;
     }
-
+    console.log("Saved week days: " + selectedDays);
     const habit = {
       title: selectedActivity,
       duration: duration,
@@ -165,7 +165,10 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
       </View>
       <View>
         <Text style={styles.label}>Days of the week</Text>
-        <SelectWeekDays onChange={selectedDaysHandler} />
+        <SelectWeekDays
+          onChange={selectedDaysHandler}
+          setDays={habit.selectedDaysOfWeek}
+        />
         {errors.daysError && (
           <Text style={styles.errorText}>{errors.daysError}</Text>
         )}
