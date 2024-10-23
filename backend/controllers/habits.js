@@ -123,6 +123,59 @@ exports.postHabit = async (req, res) => {
   }
 };
 
+exports.putHabitEntry = async (req, res) => {
+  const updateData = req.body;
+  const title = updateData.title;
+  const category = updateData.category;
+  const selectedDaysOfWeek = updateData.selectedDaysOfWeek;
+
+  const userId = req.user.userId;
+  const habitId = req.params.habitId;
+  const action = "put_habit_entry";
+
+  let detailData;
+  switch (category) {
+    case "Smoking":
+      detailData = { numberOfCigarettes: updateData.numberOfCigarettes };
+      break;
+    case "Alcohol":
+      detailData = { numberOfDrinks: updateData.numberOfDrinks };
+      break;
+    case "Exercise":
+      detailData = {
+        duration: updateData.duration,
+        distance: updateData.distance,
+      };
+      break;
+    case "Diet":
+      detailData = { habitType: updateData.habitType };
+      break;
+    default:
+      detailData = {};
+  }
+
+  try {
+    logger.info(
+      { action: action, habitData: updateData, habitId: habitId },
+      "Trying to update habit."
+    );
+    const updatedHabit = await Habit.findByIdAndUpdate(
+      habitId,
+      { title, category, details: detailData, selectedDaysOfWeek, userId },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!updatedHabit) {
+      return res.status(404).json({ message: "Habit not found" });
+    }
+    res.send(updatedHabit);
+  } catch (error) {
+    handleError(res, error, action);
+  }
+};
+
 exports.deleteHabit = async (req, res) => {
   const { habitId } = req.params;
   const userId = req.user.userId;
@@ -452,7 +505,6 @@ exports.deleteHabitEntry = async (req, res, next) => {
 exports.getHabitCategoriesForUser = async (req, res, next) => {
   const userId = req.user.userId;
   let stringUserId = userId.toString();
-  console.log(userId);
   try {
     const habitCategories = await Habit.aggregate([
       {
@@ -464,7 +516,6 @@ exports.getHabitCategoriesForUser = async (req, res, next) => {
       { $sort: { _id: 1 } },
     ]);
 
-    console.log("IN HABIT CATEGORIES" + habitCategories);
     logger.info(
       {
         action: "get_habit_ategiries",

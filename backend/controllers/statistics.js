@@ -26,7 +26,6 @@ exports.getSmokingStats = async (req, res) => {
         $gte: normalizedStartDate,
         $lte: normalizedEndDate,
       },
-      isCompleted: true,
     });
 
     logger.info(
@@ -89,7 +88,6 @@ exports.getAlcoholStats = async (req, res) => {
         $gte: normalizedStartDate,
         $lte: normalizedEndDate,
       },
-      isCompleted: true,
     });
 
     logger.info(

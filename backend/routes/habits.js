@@ -20,6 +20,8 @@ router.get("/", habitsController.getHabits);
 
 router.post("/", habitsController.postHabit);
 
+router.put("/:habitId", habitsController.putHabitEntry);
+
 router.delete("/:habitId", habitsController.deleteHabit);
 
 router.get("/:date", habitsController.getHabitsByDate);
