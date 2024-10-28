@@ -24,6 +24,7 @@ function StatsContextProvider({ children }) {
   });
   const [categories, setCategories] = useState([]);
   const [level, setLevel] = useState(1);
+
   const incrementStat = (updatedStat, increment) => {
     console.log("In increment stat..." + updatedStat + increment);
     console.log("Before" + JSON.stringify(stats));

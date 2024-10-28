@@ -26,7 +26,6 @@ import GreyPlanet from "../assets/svgs/GreyPlanet.svg";
 import ProgressStarsBackground from "../assets/svgs/ProgressStarsBackground.svg";
 import BackgroundStarsBig from "../assets/svgs/BackgroundStarsBig.svg";
 
-import Spaceship from "../assets/svgs/Spaceship.svg";
 import ProgressBar from "../ui/ProgressBar";
 import ShipProgress from "../ui/ShipProgress";
 import axios from "axios";
@@ -34,7 +33,6 @@ const imageSrc = require("../assets/imgs/level1.png");
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 import { BACKEND_URL } from "@env";
-const backendURL = BACKEND_URL + "/game";
 
 export const LEVELS = [
   {
@@ -72,7 +70,6 @@ function HomeScreen() {
   const token = authCtx.token;
   const userFirstName = "George";
   const [modalVisible, setModalVisible] = useState(false);
-  const [fetchedMessage, setFetchedMessage] = useState("");
   const [assets, error] = useAssets([require("../assets/imgs/level1.png")]);
 
   /////////////////////////////////////////////
@@ -89,13 +86,6 @@ function HomeScreen() {
   } = useContext(StatsContext);
   // const [currentLevel, setCurrentLevel] = useState(1);
   const [levelProgress, setLevelProgress] = useState(0);
-
-  // Spaceship params //
-  // TODO: think about animation of ship
-  //////////////////////
-
-  const spaceshipPositionHorizontal = deviceWidth * 5 * (10 / 100);
-  const spaceshipPositionVertical = deviceHeight * 0.5;
 
   ////// HOOKS /////
   //////////////////
@@ -262,19 +252,9 @@ function HomeScreen() {
             />
           </View>
         </View>
-        {/* <View
-          style={{
-            position: "absolute",
-            left: spaceshipPositionHorizontal,
-            top: spaceshipPositionVertical - spaceshipPositionHorizontal * 0.4,
-            transform: [{ rotate: "-20deg" }],
-          }}>
-          <Spaceship width={75} height={75} />
-        </View> */}
 
         <View style={styles.messageContainer}>
           <LinearGradient
-            // Background Linear Gradient
             colors={["white", Colors.primaryBackgroundLight]}
             style={styles.background}
           />

@@ -20,6 +20,8 @@ async function deleteItemFor(key) {
 
 export const AuthContext = createContext({
   token: "",
+  pushToken: "",
+  savePushToken: () => {},
   isSignedIn: false,
   signIn: () => {},
   signOut: () => {},
@@ -27,6 +29,7 @@ export const AuthContext = createContext({
 
 function AuthContextProvider({ children }) {
   const [userToken, setUserToken] = useState();
+  const [pushToken, setPushToken] = useState();
 
   useEffect(() => {
     async function fetchToken() {
@@ -49,11 +52,17 @@ function AuthContextProvider({ children }) {
     deleteItemFor("userToken");
   }
 
+  function savePushToken(token) {
+    setPushToken(token);
+  }
+
   const value = {
     token: userToken,
     isSignedIn: !!userToken,
     signIn: signIn,
     signOut: signOut,
+    pushToken: pushToken,
+    savePushToken: savePushToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -4,11 +4,8 @@ import { Colors } from "../../constants/Colors";
 import { Dimensions } from "react-native";
 import HomeScreen from "../../screens/Home";
 import HabitsScreen from "../../screens/Habits";
-import DrawerNav from "./Drawer";
-import MessagesScreen from "../../screens/Messages";
 import Settings from "../../screens/Settings";
 import StatisticsScreen from "../../screens/Statistics";
-import Achievements from "../../screens/Achievements";
 
 const screenWidth = Dimensions.get("window").width;
 const iconSize = screenWidth * 0.08; // 9% of screen width
