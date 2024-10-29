@@ -73,7 +73,7 @@ exports.postUseResources = async (req, res, next) => {
     });
   } catch (error) {
     logger.error({ error, action: "use_resources" }, "An error occurred.");
-    res.send(500).json({ error: "Failed to use resources" });
+    res.sendStatus(500).json({ error: "Failed to use resources" });
   }
 };
 
@@ -94,6 +94,6 @@ exports.getUserProgress = async (req, res) => {
     });
   } catch (error) {
     logger.error({ error, action: "get_stats" }, "An error occurred.");
-    res.send(500).json({ error: "Failed to fetch user stats: " + error });
+    res.sendStatus(500).json({ error: "Failed to fetch user stats: " + error });
   }
 };

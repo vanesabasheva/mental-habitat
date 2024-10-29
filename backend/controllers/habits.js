@@ -170,7 +170,7 @@ exports.putHabitEntry = async (req, res) => {
     if (!updatedHabit) {
       return res.status(404).json({ message: "Habit not found" });
     }
-    res.send(updatedHabit);
+    res.json(updatedHabit);
   } catch (error) {
     handleError(res, error, action);
   }

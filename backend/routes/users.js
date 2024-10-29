@@ -12,22 +12,7 @@ router.post("/login", authController.postLogin);
 router.post("/logout", authController.postLogout);
 
 router.get("/user-token", (req, res, next) => {
-  res.send();
-});
-
-router.get("/has-responded-to-survey", async (req, res, next) => {
-  try {
-    // Find the user by ID
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    // Send the hasRespondedToSurvey field as part of the response
-    res.send({ hasRespondedToSurvey: user.hasCompletedSurvey });
-  } catch (error) {
-    console.error("Failed to retrieve survey status:", error);
-  }
+  // res.send();
 });
 
 router.post("/reset", async (req, res, next) => {
