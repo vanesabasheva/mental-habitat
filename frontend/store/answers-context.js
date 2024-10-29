@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useEffect, useState } from "react";
 
 export const AnswersContext = createContext({
@@ -44,6 +45,23 @@ function AnswersContextProvider({ children }) {
     15: [],
   });
   const [hasCompletedSurvey, setHasCompletedSurvey] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      const hasCompletedSurveyString = await AsyncStorage.getItem(
+        "hasCompletedSurvey"
+      );
+      const hasCompletedSurveyBool = hasCompletedSurveyString === "true";
+
+      const answersString = await AsyncStorage.getItem("answers");
+      if (answersString) {
+        const answerObj = JSON.parse(answersString);
+        setAnswers(answerObj);
+        setHasCompletedSurvey(hasCompletedSurveyBool);
+      }
+    }
+    fetchData();
+  }, []);
 
   const updateAnswers = (questionId, newAnswer) => {
     setAnswers((prevState) => ({

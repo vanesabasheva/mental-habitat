@@ -24,7 +24,7 @@ const Stack = createNativeStackNavigator();
 function Navigation() {
   const authCtx = useContext(AuthContext);
   const answersCtx = useContext(AnswersContext);
-  const hasCompletedSurvey = answersCtx.hasCompletedSurvey;
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -34,7 +34,7 @@ function Navigation() {
           contentStyle: { backgroundColor: Colors.primaryBackgroundLight },
         }}>
         {authCtx.isSignedIn ? (
-          hasCompletedSurvey ? (
+          answersCtx.hasCompletedSurvey ? (
             <Stack.Screen
               name="Root"
               component={BottomTab}

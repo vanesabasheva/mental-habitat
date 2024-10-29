@@ -11,6 +11,7 @@ import FlatButton from "../ui/ButtonFlat";
 import BackgroundStarsBig from "../assets/svgs/BackgroundStarsBig.svg";
 import { useContext } from "react";
 import { AnswersContext } from "../store/answers-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const story = [
   {
@@ -72,17 +73,26 @@ function Story({ route, navigation }) {
   const storyPart = route.params.story;
   const storyline = story.find((subStory) => subStory.id === storyPart);
 
-  let buttonText = storyPart !== 4 ? "Continue" : "Start";
+  let buttonText = storyPart !== 4 ? "Continue" : "Launch Mission";
   const answersCtx = useContext(AnswersContext);
 
-  const nextScreenHandler = () => {
+  const nextScreenHandler = async () => {
     if (storyPart !== 4) {
       navigation.push("StoryScreen", { story: storyPart + 1 });
     } else {
       console.log(answersCtx);
+
+      // store data on the device so that when app is closed, the answers persist
+      const answersString = JSON.stringify(answersCtx.answers);
+      await AsyncStorage.setItem("hasCompletedSurvey", "true");
+      await AsyncStorage.setItem("answers", answersString);
+
+      //TODO: post request to /post habit for initial 2-3 habits
+
       answersCtx.setHasCompletedSurvey(true);
     }
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
