@@ -3,15 +3,26 @@ import { View, Text, TextInput, FlatListComponent } from "react-native";
 import IconButton from "../../../ui/ButtonIcon";
 import { Colors } from "../../../constants/Colors";
 import { deviceHeight, deviceWidth } from "../../../constants/Dimensions";
-import * as Notifications from "expo-notifications";
+import { scheduleNotificationForHabit } from "../../../util/notifications";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+const getNotificationId = (habitEntryId, day) =>
+  `substanceLog-${habitEntryId}-${day}`;
+
+async function notifyUserForGoal(
+  newConsumedToday,
+  habitEntry,
+  text,
+  goal,
+  day
+) {
+  const notificationId = getNotificationId(habitEntry._id, day);
+  const title = `Hey, ${newConsumedToday} ${text} consumed today is over your goal of ${goal}.`;
+  const body = "Remember why you do this, you got this!";
+  const trigger = {
+    seconds: 1,
+  };
+  await scheduleNotificationForHabit(notificationId, title, body, trigger);
+}
 
 function SubstanceHabitLog({ mode, habitEntry, onLog }) {
   const [consumedToday, setConsumedToday] = useState(0);
@@ -51,23 +62,8 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
     consumedToday === 1 ? (consumedText = "drink") : (consumedText = "drinks");
   }
 
-  async function notifyUserForGoal(newConsumedToday) {
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: `Hey, ${newConsumedToday} ${text} consumed today is over your goal of ${goal}.`,
-        body: "Remember your motivation, you got this!",
-      },
-      trigger: {
-        seconds: 1,
-      },
-    });
-    console.log(
-      `Hey, ${newConsumedToday} ${text} consumed today is over your goal of ${goal}.`
-    );
-    console.log("Goal not met!!!!!!!" + newConsumedToday + text + goal);
-  }
   function increase() {
-    setConsumedToday((prevState) => {
+    setConsumedToday(async (prevState) => {
       const newState = (prevState += 1);
       if (mode === "Smoking") {
         onLog({
@@ -82,7 +78,13 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
       }
 
       if (newState >= goal) {
-        notifyUserForGoal(newState);
+        await notifyUserForGoal(
+          newState,
+          habitEntry,
+          consumedText,
+          goal,
+          habitEntry.day
+        );
       }
 
       return newState;

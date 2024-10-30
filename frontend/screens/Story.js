@@ -1,5 +1,4 @@
 import { View, StyleSheet, Text } from "react-native";
-import { screenHeight, screenWidth } from "../constants/Dimensions";
 import { Colors } from "../constants/Colors";
 import ZenithIcon from "../assets/svgs/StoryIcons/Zenith.svg";
 import TulipsPlanet from "../assets/svgs/StoryIcons/TulipsPlanet.svg";

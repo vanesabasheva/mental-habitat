@@ -1,6 +1,6 @@
 import "./gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { Colors } from "./constants/Colors";
@@ -16,9 +16,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { View, Text, SafeAreaView } from "react-native";
 import IconButton from "./ui/ButtonIcon";
 import BottomTab from "./components/Navigation/BottomTab";
-import * as Notifications from "expo-notifications";
 import WizzardStack from "./components/Navigation/WizzardStack";
 //SplashScreen.preventAutoHideAsync();
+import { registerForPushNotificationsAsync } from "./util/notifications";
+
 const Stack = createNativeStackNavigator();
 
 function Navigation() {
@@ -78,10 +79,16 @@ export default function App() {
     "robotomono-regular": require("./assets/fonts/RobotoMono-Regular.ttf"),
   });
 
+  const [expoPushToken, setExpoPushToken] = useState("");
+
   useEffect(() => {
     if (loaded || error) {
       SplashScreen.hideAsync();
     }
+
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token ?? "")
+    );
   }, [loaded, error]);
 
   if (!loaded && !error) {
@@ -110,21 +117,4 @@ export default function App() {
       </AuthContextProvider>
     </>
   );
-}
-
-async function registerForPushNotificationsAsync() {
-  let token;
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  if (finalStatus !== "granted") {
-    alert("Failed to get push token for push notification!");
-    return;
-  }
-  token = (await Notifications.getExpoPushTokenAsync()).data;
-  console.log(token);
-  return token;
 }

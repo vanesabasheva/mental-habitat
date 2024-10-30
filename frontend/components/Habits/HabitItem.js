@@ -26,6 +26,48 @@ import { deviceWidth, deviceHeight } from "../../constants/Dimensions";
 import SubstanceHabitLog from "./LogHabit/SubstanceHabitLog";
 import DietHabitLog from "./LogHabit/DietHabitLog";
 import ExerciseHabitLog from "./LogHabit/ExerciseHabitLog";
+import {
+  scheduleNotificationForHabit,
+  cancelNotificationById,
+} from "../../util/notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const getNotificationId = (habitEntryId, day) => `habit-${habitEntryId}-${day}`;
+
+const scheduleHabitReminder = async (
+  habit,
+  habitEntry,
+  day,
+  habitUnchecked
+) => {
+  const now = new Date();
+  const reminderTime = new Date(day);
+  reminderTime.setHours(20, 0, 0, 0);
+  console.log(reminderTime);
+  console.log(now);
+
+  if (now < reminderTime && (!habitEntry.isCompleted || habitUnchecked)) {
+    const notificationId = getNotificationId(habitEntry._id, day);
+    console.log("Scheduling notification.... " + notificationId);
+
+    const answersString = await AsyncStorage.getItem("answers");
+    const answersObj = JSON.parse(answersString);
+
+    const title = `Reminder to complete your habit "${habit.title}" `;
+    const body = `Remember why you want to do this!: "${answersObj[9]}"`;
+    const trigger = {
+      hour: 20,
+      minute: 0,
+      repeats: false,
+    };
+
+    console.log(title);
+    console.log(body);
+    await scheduleNotificationForHabit(notificationId, title, body, trigger);
+  } else {
+    console.log("No Notification needed to be scheduled.");
+  }
+};
 
 function HabitItem({ habit, day, onDeleteHabit }) {
   const { _id, title, details, habitType, selectedDaysOfWeek, category } =
@@ -214,6 +256,9 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       console.log(response.data);
       const stats = response.data.stats;
       statsCtx.incrementStat(stats.updatedStat, stats.increment);
+
+      const notificationId = getNotificationId(habitEntry._id, day);
+      await cancelNotificationById(notificationId);
     } catch (error) {
       console.log(error);
       setIsHabitChecked(false);
@@ -239,6 +284,8 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       console.log(response.data);
       const stats = response.data.stats;
       statsCtx.incrementStat(stats.updatedStat, stats.increment);
+
+      //await scheduleHabitReminder(habitEntry, day, true);
     } catch (error) {
       console.log(error);
       setIsHabitChecked(true);
@@ -255,6 +302,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
 
   useEffect(() => {
     const fetchHabitEntryForDay = async () => {
+      let habitEntry;
       try {
         const response = await axios.get(BACKEND_URL + "/habits/habitEntry", {
           params: {
@@ -265,7 +313,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
         });
 
         //TODO: optimize setting of properties in states, one state is enough
-        const habitEntry = response.data;
+        habitEntry = response.data;
         setHabitEntryId(habitEntry._id);
         setHabitEntry(habitEntry);
         setIsHabitChecked(habitEntry.isCompleted);
@@ -296,9 +344,15 @@ function HabitItem({ habit, day, onDeleteHabit }) {
           console.error("An error occurred:", error.message);
         }
       }
+      await scheduleHabitReminder(habit, habitEntry, day, false);
     };
 
     fetchHabitEntryForDay();
+    return () => {
+      // This will cancel the notification when the component unmounts or if the habit gets completed
+      const notificationId = getNotificationId(habitEntry._id, day);
+      cancelNotificationById(notificationId);
+    };
   }, []);
 
   const openModal = () => {
