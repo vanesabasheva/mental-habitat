@@ -60,12 +60,17 @@ app.use(express.urlencoded({ extended: true }));
 const morgan = require("morgan");
 const fs = require("fs");
 const path = require("path");
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access.log"),
-  { flags: "a" }
-);
-
-app.use(morgan("combined", { stream: accessLogStream }));
+if (process.env.NODE_ENV === "production") {
+  app.use(morgan("combined")); // Log to stdout in production
+} else {
+  const fs = require("fs");
+  const path = require("path");
+  const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, "access.log"),
+    { flags: "a" }
+  );
+  app.use(morgan("combined", { stream: accessLogStream }));
+}
 const PORT = process.env.PORT || 3000;
 
 /////////////////////
