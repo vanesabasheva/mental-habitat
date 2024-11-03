@@ -27,11 +27,11 @@ exports.postRegister = async (req, res) => {
 
     const savedUser = await newUser.save();
     const token = generateToken(savedUser._id);
-    res.json({ accessToken: token });
+    return res.status(201).json({ accessToken: token });
   } catch (e) {
     if (e.code === 11000) {
       logger.warn({ action: "register", email }, "Email already in use.");
-      res.status(400).json({
+      return res.status(400).json({
         error:
           "Email already used with another account. Please use a different email",
       });
@@ -64,7 +64,7 @@ exports.postLogin = async (req, res) => {
 
     const token = generateToken(user._id);
     logger.info({ action: "login", email }, "Login successful.");
-    res.json({ accessToken: token });
+    return res.json({ accessToken: token });
   } catch (error) {
     handleError(res, error);
   }

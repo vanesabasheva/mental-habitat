@@ -1,21 +1,29 @@
 // Setup Logger
 const bunyan = require("bunyan");
 const seq = require("bunyan-seq");
+
 require("dotenv").config();
 
-const logger = bunyan.createLogger({
+const logger2 = bunyan.createLogger({
   name: "MentalHabitat",
   streams: [
     {
       stream: process.stdout,
-      level: "warn",
+      level: process.env.NODE_ENV === "production" ? "error" : "warn",
     },
     seq.createStream({
       serverUrl: "http://localhost:5341",
-      level: "info",
+      level: process.env.NODE_ENV === "production" ? "info" : "debug",
     }),
   ],
 });
+
+const logger = {
+  info: (object, message) => {},
+  warn: (object, message) => {},
+  error: (object, message) => {},
+  debug: (object, message) => {},
+};
 
 /////////////////////////////////////////////
 // Export logger to other parts of the app //
@@ -39,9 +47,25 @@ const { connect } = require("./util/database");
 // Middleware //
 ////////////////
 const cors = require("cors");
+const helmet = require("helmet");
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+///////////////////
+// Morgan logging//
+///////////////////
+
+const morgan = require("morgan");
+const fs = require("fs");
+const path = require("path");
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+
+app.use(morgan("combined", { stream: accessLogStream }));
 const PORT = process.env.PORT || 3000;
 
 /////////////////////
@@ -65,7 +89,7 @@ app.use("/statistics", statisticsRoutes);
 ////////////////////
 app.use((err, req, res, next) => {
   logger.error("Unhandled exception", err);
-  res.status(500).send("Server error. Please try again later.");
+  return res.status(500).send("Server error. Please try again later.");
 });
 
 async function startServer() {

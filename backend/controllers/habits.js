@@ -7,18 +7,18 @@ const { default: mongoose } = require("mongoose");
 
 exports.getHabits = async (req, res) => {
   const userId = req.user.userId; // Extracted from decoded JWT
-  logger.info({ action: "get_habits", userId }, "Fetching user habits.");
+  logger.debug({ action: "get_habits", userId }, "Fetching user habits.");
   try {
     const userWithHabits = await User.findById(userId).populate("habits");
     if (!userWithHabits) {
       logger.warn({ action: "get_habits", userId }, "User not found.");
       return res.status(404).json({ message: "User not found" });
     }
-    logger.info(
+    logger.debug(
       { action: "get-habits", userId, count: userWithHabits.habits.length },
       "User habits retrieved successfully."
     );
-    res.json({ habits: userWithHabits.habits });
+    return res.json({ habits: userWithHabits.habits });
   } catch (error) {
     handleError(res, error, "get-habits");
   }
@@ -45,11 +45,11 @@ exports.getHabitsByDate = async (req, res) => {
       selectedDaysOfWeek: { $in: [dayOfWeek] },
       userId: req.user.userId,
     });
-    logger.info(
+    logger.debug(
       { action: "habits_by_date", dayOfWeek, count: habits.length },
       "Habits for day fetched."
     );
-    res.json({ habits });
+    return res.json({ habits });
   } catch (error) {
     handleError(res, error, "habits_by_date");
   }
@@ -62,7 +62,7 @@ exports.postHabit = async (req, res) => {
   const category = habit.category;
   const userId = req.user.userId;
 
-  logger.info({ action: "post_habit", userId, title }, "Creating new habit.");
+  logger.debug({ action: "post_habit", userId, title }, "Creating new habit.");
 
   try {
     let detailData;
@@ -99,7 +99,7 @@ exports.postHabit = async (req, res) => {
     });
     await newHabit.save();
 
-    logger.info(
+    logger.debug(
       { action: "post_habit", habitId: newHabit._id },
       "Habit created successfully."
     );
@@ -114,7 +114,7 @@ exports.postHabit = async (req, res) => {
     user.habits.push(newHabit._id);
     await user.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Habit created successfully!",
       habit: newHabit,
     });
@@ -155,7 +155,7 @@ exports.putHabitEntry = async (req, res) => {
   }
 
   try {
-    logger.info(
+    logger.debug(
       { action: action, habitData: updateData, habitId: habitId },
       "Trying to update habit."
     );
@@ -170,7 +170,7 @@ exports.putHabitEntry = async (req, res) => {
     if (!updatedHabit) {
       return res.status(404).json({ message: "Habit not found" });
     }
-    res.json(updatedHabit);
+    return res.json(updatedHabit);
   } catch (error) {
     handleError(res, error, action);
   }
@@ -180,14 +180,14 @@ exports.deleteHabit = async (req, res) => {
   const { habitId } = req.params;
   const userId = req.user.userId;
 
-  logger.info(
+  logger.debug(
     { action: "delete_habit", userId, habitId },
     "Attempting to delete habit."
   );
 
   try {
     const result = await Habit.findByIdAndDelete(habitId);
-    logger.info(
+    logger.debug(
       { action: "habit_deleted", habitId },
       "Habit deleted successfully."
     );
@@ -197,7 +197,7 @@ exports.deleteHabit = async (req, res) => {
     user.habits = user.habits.filter((habit) => habit.toString() !== habitId);
     // TODO: delete all habit entries of this habit
     await user.save();
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
     handleError(res, error, "delete_habit");
   }
@@ -208,11 +208,10 @@ exports.postHabitEntry = async (req, res) => {
 
   try {
     if (!day || new Date(day).toString() === "Invalid Date") {
-      console.log(day);
       return res.status(400).json({ message: "Invalid or missing date." });
     }
 
-    logger.info(
+    logger.debug(
       {
         action: "post_habit_entry",
         habitId: habitId,
@@ -290,7 +289,7 @@ exports.postHabitEntry = async (req, res) => {
       details: details,
     });
 
-    logger.info(
+    logger.debug(
       {
         action: "post_habit_entry",
         habitId: habitId,
@@ -299,7 +298,7 @@ exports.postHabitEntry = async (req, res) => {
       },
       "Habit entry log for the day successfully created."
     );
-    res.status(201).json({ habitEntry: newHabitEntry });
+    return res.status(201).json({ habitEntry: newHabitEntry });
   } catch (error) {
     handleError(res, error, "post_habit_entry");
   }
@@ -377,7 +376,7 @@ exports.patchHabitEntry = async (req, res) => {
         return res.status(500).json(statsUpdate);
       }
 
-      logger.info(
+      logger.debug(
         {
           action: "patch_habit_entry",
           habitId: habitId,
@@ -394,8 +393,8 @@ exports.patchHabitEntry = async (req, res) => {
     if (updates) {
       habitEntry.details = { ...habitEntry.details, ...updates };
     }
-    console.log("Updates" + JSON.stringify(updates));
-    logger.info(
+
+    logger.debug(
       {
         action: "patch_habit_entry",
         habitId: habitId,
@@ -405,7 +404,7 @@ exports.patchHabitEntry = async (req, res) => {
       "Habit entry log for the day successfully updated."
     );
     await habitEntry.save();
-    res.status(200).json({ habitEntry: habitEntry });
+    return res.status(200).json({ habitEntry: habitEntry });
   } catch (error) {
     handleError(res, error, "patch_habit_entry");
   }
@@ -414,7 +413,7 @@ exports.patchHabitEntry = async (req, res) => {
 exports.getHabitEntry = async (req, res) => {
   const { habitId, day } = req.query;
   try {
-    logger.info(
+    logger.debug(
       {
         action: "get_habit_entry",
         habitId: habitId,
@@ -432,7 +431,7 @@ exports.getHabitEntry = async (req, res) => {
     });
 
     if (!habitEntry) {
-      logger.info(
+      logger.warn(
         {
           action: "get_habit_entry",
           habitId: habitId,
@@ -442,7 +441,7 @@ exports.getHabitEntry = async (req, res) => {
       );
       return res.status(404).json({ message: "Habit entry not found" });
     }
-    logger.info(
+    logger.debug(
       {
         action: "get_habit_entry",
         habitId: habitId,
@@ -460,7 +459,7 @@ exports.getHabitEntry = async (req, res) => {
 exports.deleteHabitEntry = async (req, res, next) => {
   const { habitEntryId } = req.params;
 
-  logger.info(
+  logger.debug(
     { action: "delete_habit_entry", habitEntryId: habitEntryId },
     "Attempt to delete habit entry for the day"
   );
@@ -478,20 +477,20 @@ exports.deleteHabitEntry = async (req, res, next) => {
     const user = await User.findById(userId);
     const habitWithUser = await Habit.findById(habitEntry.habitId);
 
-    logger.info(
+    logger.debug(
       { action: "delete_habit_entry", habit: habitWithUser },
       "Habit and user found."
     );
 
     const result = await HabitEntry.findByIdAndDelete(habitEntryId);
-    logger.info(
+    logger.debug(
       { action: "delete_habit_entry", habitEntryId },
       "Habit entry deleted successfully."
     );
 
     const statsUpdate = await updateStats(habitWithUser.category, user, false);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Habit entry deleted successfully",
       stats: statsUpdate,
     });
@@ -516,7 +515,7 @@ exports.getHabitCategoriesForUser = async (req, res, next) => {
       { $sort: { _id: 1 } },
     ]);
 
-    logger.info(
+    logger.debug(
       {
         action: "get_habit_ategiries",
         user: userId,
@@ -605,5 +604,5 @@ async function updateStats(category, user, isIncrementing) {
 
 function handleError(res, error, action) {
   logger.error({ error, action: action }, "An error occurred.");
-  res.status(500).json({ error: "Server error!", error });
+  return res.status(500).json({ error: "Server error!", error });
 }

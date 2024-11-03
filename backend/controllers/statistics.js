@@ -12,7 +12,10 @@ exports.getSmokingStats = async (req, res) => {
   normalizedEndDate.setUTCHours(0, 0, 0, 0);
 
   try {
-    logger.info({ action: action, userId: userId }, "Smoking stats requested.");
+    logger.debug(
+      { action: action, userId: userId },
+      "Smoking stats requested."
+    );
     // Find all smoking-related habits for the user
     const smokingHabit = await Habit.findOne({ userId, category: "Smoking" });
 
@@ -74,7 +77,10 @@ exports.getAlcoholStats = async (req, res) => {
   normalizedStartDate.setUTCHours(0, 0, 0, 0);
   normalizedEndDate.setUTCHours(0, 0, 0, 0);
   try {
-    logger.info({ action: action, userId: userId }, "Alcohol stats requested.");
+    logger.debug(
+      { action: action, userId: userId },
+      "Alcohol stats requested."
+    );
     // Find an alcohol-related habit for the user
     const alcoholHabit = await Habit.findOne({ userId, category: "Alcohol" });
 
@@ -90,7 +96,7 @@ exports.getAlcoholStats = async (req, res) => {
       },
     });
 
-    logger.info(
+    logger.debug(
       {
         action: action,
         userId: userId,
@@ -193,7 +199,7 @@ exports.getDietStats = async (req, res) => {
   normalizedEndDate.setUTCHours(0, 0, 0, 0);
 
   try {
-    logger.info(
+    logger.debug(
       { action: action, userId: userId, startDate: normalizedStartDate },
       "Diet stats requested."
     );
@@ -228,9 +234,7 @@ exports.getDietStats = async (req, res) => {
         },
       },
     ]);
-
-    console.log(entries);
-    res.status(200).json(entries);
+    return res.status(200).json(entries);
   } catch (error) {
     handleError(res, error, action);
   }
@@ -238,5 +242,5 @@ exports.getDietStats = async (req, res) => {
 
 function handleError(res, error, action) {
   logger.error({ error, action: action }, "An error occurred.");
-  res.status(500).json({ error: "Server error!", error });
+  return res.status(500).json({ error: "Server error!", error });
 }

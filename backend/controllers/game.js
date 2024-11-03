@@ -4,7 +4,7 @@ const logger = require("../app");
 exports.postUseResources = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-    logger.info(
+    logger.debug(
       { action: "use_resources", userId: userId },
       "User resource usage initiated."
     );
@@ -33,7 +33,7 @@ exports.postUseResources = async (req, res, next) => {
     );
 
     if (user.levelProgress === 100) {
-      logger.info(
+      logger.debug(
         {
           action: "use_resources; level_up",
           userId: userId,
@@ -56,7 +56,7 @@ exports.postUseResources = async (req, res, next) => {
     }
 
     await user.save();
-    logger.info(
+    logger.debug(
       {
         action: "use_resources; resources_used",
         userId: userId,
@@ -66,14 +66,14 @@ exports.postUseResources = async (req, res, next) => {
       "Resources used and progress updated successfully."
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Resources used. Progress updated",
       currentLevel: user.currentLevel,
       levelProgress: user.levelProgress,
     });
   } catch (error) {
     logger.error({ error, action: "use_resources" }, "An error occurred.");
-    res.sendStatus(500).json({ error: "Failed to use resources" });
+    return res.sendStatus(500).json({ error: "Failed to use resources" });
   }
 };
 
@@ -82,18 +82,20 @@ exports.getUserProgress = async (req, res) => {
 
   try {
     const user = await User.findById(userId);
-    logger.info(
+    logger.debug(
       { action: "get_stats", userId: userId },
       "User stats requested."
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       stats: user.stats,
       levelProgress: user.levelProgress,
       currentLevel: user.currentLevel,
     });
   } catch (error) {
     logger.error({ error, action: "get_stats" }, "An error occurred.");
-    res.sendStatus(500).json({ error: "Failed to fetch user stats: " + error });
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch user stats: " + error.toString() });
   }
 };
