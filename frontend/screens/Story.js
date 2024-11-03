@@ -10,7 +10,10 @@ import FlatButton from "../ui/ButtonFlat";
 import BackgroundStarsBig from "../assets/svgs/BackgroundStarsBig.svg";
 import { useContext } from "react";
 import { AnswersContext } from "../store/answers-context";
+import { BACKEND_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../store/auth-context";
+const backendURL = `${BACKEND_URL}/habits`;
 
 const story = [
   {
@@ -68,12 +71,70 @@ const story = [
   },
 ];
 
+const prefillHabits = async (answers, token) => {
+  try {
+    const answerQ1 = answers[1];
+    console.log("Habit answer 1" + answerQ1);
+
+    const habitObjects = answerQ1
+      .map((answer) => {
+        let habitObject = {};
+        switch (answer) {
+          case "Quit Smoking":
+            habitObject.title = "Have healthy lungs";
+            habitObject.category = "Smoking";
+            habitObject.numberOfCigarettes = "2";
+            break;
+          case "Increase Physical Activity":
+            habitObject.title = "Walking";
+            habitObject.category = "Exercise";
+            habitObject.duration = "30";
+            habitObject.distance = "3";
+            break;
+          case "Minimize Alcohol Consumption":
+            habitObject.title = answers[9];
+            habitObject.category = "Alcohol";
+            habitObject.numberOfDrinks = 2;
+            break;
+          case "Improve Nutrition":
+            habitObject.title = "Eat 5 veggies today";
+            habitObject.category = "Diet";
+            habitObject.habitType = "new";
+            break;
+          default:
+            return null;
+        }
+        return habitObject;
+      })
+      .filter((h) => h !== null);
+
+    console.log(habitObjects);
+    if (!habitObjects) {
+      console.log("No habits were set.");
+      return;
+    }
+    if (habitObjects.length > 0) {
+      // loop through habitObjects to send multiple requests
+      habitObjects.forEach(async (habitObject) => {
+        const response = await axios.post(backendURL, habitObject, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Habit is set: " + response.data);
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 function Story({ route, navigation }) {
   const storyPart = route.params.story;
   const storyline = story.find((subStory) => subStory.id === storyPart);
 
   let buttonText = storyPart !== 4 ? "Continue" : "Launch Mission";
   const answersCtx = useContext(AnswersContext);
+  const authCtx = useContext(AuthContext);
+  const token = authCtx.token;
 
   const nextScreenHandler = async () => {
     if (storyPart !== 4) {
@@ -87,7 +148,7 @@ function Story({ route, navigation }) {
       await AsyncStorage.setItem("answers", answersString);
 
       //TODO: post request to /post habit for initial 2-3 habits
-
+      await prefillHabits(answersCtx.answers, token);
       answersCtx.setHasCompletedSurvey(true);
     }
   };

@@ -19,8 +19,8 @@ const questions = [
     options: [
       "Quit Smoking",
       "Increase Physical Activity",
-      "Minimize alcohol consumption",
-      "Improve nutrition",
+      "Minimize Alcohol Consumption",
+      "Improve Nutrition",
     ],
   },
   {
