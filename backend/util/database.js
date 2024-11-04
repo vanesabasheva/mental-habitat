@@ -23,6 +23,7 @@ async function connect() {
       autoIndex: true,
     });
     logger.info(`MongoDB Atlas Connected: ${conn.connection.host}`);
+    return conn;
   } catch (error) {
     logger.error({ error }, "Failed to connect to MongoDB");
     throw error;
