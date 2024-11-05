@@ -25,6 +25,7 @@ function DietHabitLog({ habitEntry, onLog }) {
           height: deviceHeight * 0.25,
           borderRadius: 32,
           marginBottom: 12,
+          overflow: "hidden",
         }}>
         <Text
           style={{

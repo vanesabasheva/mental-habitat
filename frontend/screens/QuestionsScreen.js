@@ -5,11 +5,19 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import Button from "../ui/Button";
 import { AnswersContext } from "../store/answers-context";
 import { deviceWidth, deviceHeight } from "../constants/Dimensions";
+
+const DismissKeyboard = ({ children }) => (
+  <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    {children}
+  </TouchableWithoutFeedback>
+);
 
 const questions = [
   {
@@ -245,24 +253,27 @@ function QuestionsScreen({ route, navigation }) {
         );
       case "text":
         return (
-          <View
-            style={{
-              marginTop: 32,
-              backgroundColor: "white",
-              width: deviceWidth * 0.7,
-              height: deviceHeight * 0.25,
-              borderRadius: 32,
-              marginBottom: 12,
-            }}>
-            <TextInput
-              multiline
-              numberOfLines={4}
-              editable
-              value={textInput}
-              onChangeText={(text) => setTextInput(text)}
-              style={{ padding: 10 }}
-            />
-          </View>
+          <DismissKeyboard>
+            <View
+              style={{
+                marginTop: 32,
+                backgroundColor: "white",
+                width: deviceWidth * 0.7,
+                height: deviceHeight * 0.25,
+                borderRadius: 32,
+                marginBottom: 12,
+                padding: 12,
+              }}>
+              <TextInput
+                multiline
+                numberOfLines={4}
+                editable
+                value={textInput}
+                onChangeText={(text) => setTextInput(text)}
+                style={{ padding: 10 }}
+              />
+            </View>
+          </DismissKeyboard>
         );
       default:
         return null;

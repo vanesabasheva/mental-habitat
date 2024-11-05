@@ -8,7 +8,7 @@ import SubstanceChart from "../components/Statistics/SubstanceChart";
 function StatisticsScreen() {
   return (
     <>
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>Your stats</Text>
         </View>
@@ -18,7 +18,7 @@ function StatisticsScreen() {
           <SubstanceChart mode="Alcohol" />
           <ExerciseChart />
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </>
   );
 }

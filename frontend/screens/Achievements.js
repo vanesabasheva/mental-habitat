@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primaryBackgroundLight,
-    paddingTop: 70,
+    // paddingTop: 70,
     gap: 50,
     padding: 32,
     alignItems: "center",
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 8,
     marginHorizontal: 20,
-    top: deviceHeight * 0.1,
+    top: deviceHeight * 0.05,
   },
   title: {
     fontSize: 24,

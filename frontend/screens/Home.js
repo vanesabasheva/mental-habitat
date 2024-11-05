@@ -33,6 +33,7 @@ const imageSrc = require("../assets/imgs/level1.png");
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 import { BACKEND_URL } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const LEVELS = [
   {
@@ -68,7 +69,8 @@ export const LEVELS = [
 function HomeScreen() {
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
-  const userFirstName = "George";
+  const [userFirstName, setUserFirstName] = useState("George");
+
   const [modalVisible, setModalVisible] = useState(false);
   const [assets, error] = useAssets([require("../assets/imgs/level1.png")]);
 
@@ -117,6 +119,12 @@ function HomeScreen() {
         setCurrentLevel(response.data.currentLevel);
 
         console.log(categories);
+
+        const storedName = await AsyncStorage.getItem('fullName');
+        if (storedName) {
+          setUserFirstName(storedName);
+        }
+        
       } catch (error) {
         console.error("Error fetching stats:", error);
       }
@@ -183,7 +191,7 @@ function HomeScreen() {
           </View>
         </Modal>
 
-        <View>
+        <View style={{ zIndex: 2 }}>
           <Text style={styles.welcomeMessage}>
             Welcome back, {userFirstName}!
           </Text>
@@ -195,8 +203,17 @@ function HomeScreen() {
             setCurrentLevel={setCurrentLevel}></ShipProgress>
         </View>
 
-        <View style={{ alignSelf: "flex-end", zIndex: 1 }}>
+        <View style={{ alignSelf: "flex-end", zIndex: 2 }}>
           <GreyPlanet width={150} height={150} />
+        </View>
+
+        <View
+          style={{
+            position: "absolute",
+            bottom: deviceHeight / 3,
+            zIndex: 0,
+          }}>
+          <BackgroundStarsBig width={deviceWidth} height={deviceHeight} />
         </View>
 
         <View
@@ -204,6 +221,7 @@ function HomeScreen() {
             flexDirection: "row",
             alignSelf: "baseline",
             marginHorizontal: screenWidth * 0.03,
+            zIndex: 3,
           }}>
           <View
             style={{
@@ -213,14 +231,7 @@ function HomeScreen() {
             }}>
             <ProgressStarsBackground />
           </View>
-          <View
-            style={{
-              position: "absolute",
-              bottom: -deviceHeight / 3,
-              zIndex: -1,
-            }}>
-            <BackgroundStarsBig width={deviceWidth} height={deviceHeight} />
-          </View>
+
           <Pressable
             android_ripple={{ radius: 2, color: Colors.primaryGrey }}
             onPress={() => setModalVisible(true)}

@@ -159,15 +159,17 @@ function ExerciseChart() {
     } else {
       data.forEach((element) => {
         const dayIndex = element._id - 1;
-
+        console.log("Distance" + element.totalDistance);
         // Convert Decimal128 value to a number for usage
-        const totalDistanceValue = parseFloat(
-          element.totalDistance.$numberDecimal
-        );
+        console.log(JSON.stringify(element));
+
+        let totalDistanceValue = 0;
+        if (element.totalDistance.$numberDecimal) {
+          totalDistanceValue = parseFloat(element.totalDistance.$numberDecimal);
+        }
 
         barData[dayIndex].value = totalDistanceValue;
 
-        // Update totalDuration sum, ensure it handles NaN cases gracefully
         totalDistance += totalDistanceValue || 0;
       });
     }

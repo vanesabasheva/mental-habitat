@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "MentalHabitat",
+    "name": "Mental Habitat",
     "slug": "MentalHabitat",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,6 +12,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "buildNumber":"1.0.0",
       "supportsTablet": true
     },
     "android": {

@@ -7,24 +7,48 @@ import {
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import IconButton from "../ui/ButtonIcon";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../store/auth-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Achievements from "./Achievements";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Button from "../ui/Button";
 
 const Stack = createNativeStackNavigator();
 
 function SettingsPage({ navigation }) {
+  const [userFirstName, setUserFirstName] = useState("George"); // Default name
+  const [email, setEmail] = useState("George.Johnson@email.com");
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const storedName = await AsyncStorage.getItem("fullName");
+        if (storedName) {
+          setUserFirstName(storedName);
+        }
+
+        const storedEmail = await AsyncStorage.getItem("email");
+        if (storedEmail) {
+          setEmail(storedEmail);
+        }
+      } catch (error) {
+        console.error("Failed to fetch fullName from AsyncStorage:", error);
+      }
+    };
+
+    fetchName();
+  }, []);
+
   const authCtx = useContext(AuthContext);
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <View>
           <Text style={{ fontFamily: "robotomono-bold", fontSize: 20 }}>
-            George Johnson{" "}
+            {userFirstName}
           </Text>
-          <Text>George.Johnson@email.com</Text>
+          <Text>{email}</Text>
         </View>
         <View>
           <IconButton

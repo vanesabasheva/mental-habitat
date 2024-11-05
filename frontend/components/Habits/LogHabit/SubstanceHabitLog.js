@@ -4,6 +4,7 @@ import IconButton from "../../../ui/ButtonIcon";
 import { Colors } from "../../../constants/Colors";
 import { deviceHeight, deviceWidth } from "../../../constants/Dimensions";
 import { scheduleNotificationForHabit } from "../../../util/notifications";
+import Button from "../../../ui/Button";
 
 const getNotificationId = (habitEntryId, day) =>
   `substanceLog-${habitEntryId}-${day}`;
@@ -181,6 +182,8 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
           width: deviceWidth * 0.7,
           height: deviceHeight * 0.3,
           borderRadius: 32,
+          marginBottom: 12,
+          overflow: "hidden",
         }}>
         <Text
           style={{
@@ -202,6 +205,7 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
           style={{ padding: 10 }}
         />
       </View>
+      <Button onPress={() => onLog({ notes: notes })}>Save</Button>
     </View>
   );
 }
