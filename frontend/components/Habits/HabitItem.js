@@ -16,7 +16,7 @@ import { AuthContext } from "../../store/auth-context";
 import { StatsContext } from "../../store/stats-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from "axios";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import CustomModal from "../../ui/Modal";
 import NewAlcoholHabitForm from "../Habits/NewHabit/FormAlcohol";
 import NewExerciseHabitForm from "../Habits/NewHabit/FormExercise";
@@ -45,25 +45,26 @@ const scheduleHabitReminder = async (
   reminderTime.setHours(20, 0, 0, 0);
   console.log(reminderTime);
   console.log(now);
+  if (habitEntry) {
+    if (now < reminderTime && (!habitEntry.isCompleted || habitUnchecked)) {
+      const notificationId = getNotificationId(habitEntry._id, day);
+      console.log("Scheduling notification.... " + notificationId);
 
-  if (now < reminderTime && (!habitEntry.isCompleted || habitUnchecked)) {
-    const notificationId = getNotificationId(habitEntry._id, day);
-    console.log("Scheduling notification.... " + notificationId);
+      const answersString = await AsyncStorage.getItem("answers");
+      const answersObj = JSON.parse(answersString);
 
-    const answersString = await AsyncStorage.getItem("answers");
-    const answersObj = JSON.parse(answersString);
+      const title = `Reminder to complete your habit "${habit.title}" `;
+      const body = `Remember why you want to do this!: ${answersObj[9]}`;
+      const trigger = {
+        hour: 20,
+        minute: 0,
+        repeats: false,
+      };
 
-    const title = `Reminder to complete your habit "${habit.title}" `;
-    const body = `Remember why you want to do this!: "${answersObj[9]}"`;
-    const trigger = {
-      hour: 20,
-      minute: 0,
-      repeats: false,
-    };
-
-    console.log(title);
-    console.log(body);
-    await scheduleNotificationForHabit(notificationId, title, body, trigger);
+      console.log(title);
+      console.log(body);
+      await scheduleNotificationForHabit(notificationId, title, body, trigger);
+    }
   } else {
     console.log("No Notification needed to be scheduled.");
   }
@@ -239,9 +240,11 @@ function HabitItem({ habit, day, onDeleteHabit }) {
   const handleCheck = async () => {
     setIsHabitChecked(true);
     try {
-      console.log("Checking habit... " + BACKEND_URL + "/habits/habitEntry");
+      console.log(
+        "Checking habit... " + EXPO_PUBLIC_API_URL + "/habits/habitEntry"
+      );
       const response = await axios.patch(
-        `${BACKEND_URL}/habits/habitEntry/${habitEntryId}`,
+        `${EXPO_PUBLIC_API_URL}/habits/habitEntry/${habitEntryId}`,
         {
           habitId: habit._id,
           updates: {
@@ -270,7 +273,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
     try {
       console.log(habit._id);
       const response = await axios.patch(
-        `${BACKEND_URL}/habits/habitEntry/${habitEntryId}`,
+        `${EXPO_PUBLIC_API_URL}/habits/habitEntry/${habitEntryId}`,
         {
           habitId: habit._id,
           updates: {
@@ -304,13 +307,16 @@ function HabitItem({ habit, day, onDeleteHabit }) {
     const fetchHabitEntryForDay = async () => {
       let habitEntry;
       try {
-        const response = await axios.get(BACKEND_URL + "/habits/habitEntry", {
-          params: {
-            habitId: habit._id,
-            day: day,
-          },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          EXPO_PUBLIC_API_URL + "/habits/habitEntry",
+          {
+            params: {
+              habitId: habit._id,
+              day: day,
+            },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         //TODO: optimize setting of properties in states, one state is enough
         habitEntry = response.data;
@@ -324,7 +330,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
           console.log("Creating habit entry for day...");
           try {
             const response = await axios.post(
-              BACKEND_URL + "/habits/habitEntry",
+              EXPO_PUBLIC_API_URL + "/habits/habitEntry",
               {
                 habitId: habit._id,
                 day: day,
@@ -449,7 +455,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
     console.log(habit._id);
     try {
       const response = await axios.put(
-        `${BACKEND_URL}/habits/${_id}`,
+        `${EXPO_PUBLIC_API_URL}/habits/${_id}`,
 
         updateData,
 
@@ -469,7 +475,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
     console.log(details);
     try {
       const response = await axios.patch(
-        `${BACKEND_URL}/habits/habitEntry/${habitEntryId}`,
+        `${EXPO_PUBLIC_API_URL}/habits/habitEntry/${habitEntryId}`,
         {
           habitId: habit._id,
           updates: details,
@@ -480,6 +486,10 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       );
 
       console.log(response.data);
+      statsCtx.setAllStats((prevState) => ({
+        ...prevState,
+        lastUpdated: Date.now(),
+      }));
       setHabitEntry(response.data.habitEntry);
       setLogModalVisible(false);
     } catch (error) {

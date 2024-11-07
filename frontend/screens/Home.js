@@ -32,7 +32,7 @@ import axios from "axios";
 const imageSrc = require("../assets/imgs/level1.png");
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const LEVELS = [
@@ -92,18 +92,21 @@ function HomeScreen() {
   ////// HOOKS /////
   //////////////////
   useEffect(() => {
-    console.log(BACKEND_URL);
+    console.log(EXPO_PUBLIC_API_URL);
     const fetchStats = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/game/progress`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${EXPO_PUBLIC_API_URL}/game/progress`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log("FETCHING CATEGORIES OF USER...");
 
         const categoriesResponse = await axios.get(
-          `${BACKEND_URL}/habits/habitCategories`,
+          `${EXPO_PUBLIC_API_URL}/habits/habitCategories`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -113,18 +116,19 @@ function HomeScreen() {
         console.log(categoriesResponse.data);
         const fetchedCategories = categoriesResponse.data.habitCategories;
         console.log(fetchedCategories);
-        setAllCategories(fetchedCategories);
+        const idsOfCategories = fetchedCategories.map((item) => item._id);
+        console.log("UPDATED CATEGORY OBJECT " + idsOfCategories);
+        setAllCategories(idsOfCategories);
         setAllStats(response.data.stats);
         setLevelProgress(response.data.levelProgress);
         setCurrentLevel(response.data.currentLevel);
 
         console.log(categories);
 
-        const storedName = await AsyncStorage.getItem('fullName');
+        const storedName = await AsyncStorage.getItem("fullName");
         if (storedName) {
           setUserFirstName(storedName);
         }
-        
       } catch (error) {
         console.error("Error fetching stats:", error);
       }
@@ -134,18 +138,6 @@ function HomeScreen() {
   }, [levelProgress]);
 
   const level = LEVELS[currentLevel - 1];
-  useEffect(() => {
-    // Alert.alert(
-    //   "New Planet Reached!",
-    //   `Congratulations, you've reached the next level. It's time to explore the new planet!`,
-    //   [
-    //     {
-    //       text: "Close",
-    //       onPress: () => console.log("Close Pressed"),
-    //     },
-    //   ]
-    // );
-  }, [currentLevel]);
 
   return (
     <>
@@ -203,7 +195,7 @@ function HomeScreen() {
             setCurrentLevel={setCurrentLevel}></ShipProgress>
         </View>
 
-        <View style={{ alignSelf: "flex-end", zIndex: 2 }}>
+        <View style={{ alignSelf: "flex-end", zIndex: 2, marginBottom: 12 }}>
           <GreyPlanet width={150} height={150} />
         </View>
 

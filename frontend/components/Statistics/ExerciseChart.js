@@ -3,11 +3,12 @@ import { Colors } from "../../constants/Colors";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../store/auth-context";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import IconButton from "../../ui/ButtonIcon";
-const backendUrl = BACKEND_URL + "/statistics/exercise";
+const backendUrl = EXPO_PUBLIC_API_URL + "/statistics/exercise";
 import axios from "axios";
+import { StatsContext } from "../../store/stats-context";
 
 const exerciseData = [
   {
@@ -80,6 +81,8 @@ function ExerciseChart() {
 
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
+  const statsCtx = useContext(StatsContext);
+  const stats = statsCtx.stats;
 
   const fetchData = async (currentDate) => {
     if (timePeriod === "week") {
@@ -99,7 +102,7 @@ function ExerciseChart() {
 
   useEffect(() => {
     fetchData(currentDate);
-  }, [typeData]);
+  }, [typeData, stats]);
 
   const getWeekRange = (date) => {
     const startOfWeek = new Date(

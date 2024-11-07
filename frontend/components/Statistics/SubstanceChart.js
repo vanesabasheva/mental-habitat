@@ -3,10 +3,11 @@ import { Colors } from "../../constants/Colors";
 import IconButton from "../../ui/ButtonIcon";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useState, useEffect, useContext } from "react";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import axios from "axios";
 import { AuthContext } from "../../store/auth-context";
-const backendUrl = BACKEND_URL + "/statistics";
+import { StatsContext } from "../../store/stats-context";
+const backendUrl = EXPO_PUBLIC_API_URL + "/statistics";
 
 const dummy_data = [
   { value: 0, frontColor: Colors.primaryAlcohol, label: "Mo" },
@@ -49,9 +50,11 @@ function SubstanceChart({ mode }) {
   const [currentEndDate, setCurrentEndDate] = useState(new Date());
   const [average, setAverage] = useState(0);
   const [substanceFreeDays, setSubstanceFreeDays] = useState(0);
-
+  const [maxConsumedWeek, setMaxConsumedWeek] = useState(0);
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
+  const statsCtx = useContext(StatsContext);
+  const stats = statsCtx.stats;
 
   const fetchData = async (currentDate) => {
     if (timePeriod === "week") {
@@ -71,7 +74,7 @@ function SubstanceChart({ mode }) {
 
   useEffect(() => {
     fetchData(currentDate);
-  }, []);
+  }, [stats]);
 
   // Helper Functions//
   /////////////////////
@@ -111,6 +114,7 @@ function SubstanceChart({ mode }) {
     const frontColor =
       mode === "Smoking" ? Colors.primarySmoking : Colors.primaryAlcohol;
 
+    console.log("Mode: and color" + frontColor + mode);
     let barData = days.map((label) => ({
       label,
       value: 0,
@@ -119,6 +123,7 @@ function SubstanceChart({ mode }) {
 
     let totalConsumption = 0;
     let noSubstanceDays = 0;
+    let maxConsumed = 0;
 
     if (mode === "Smoking") {
       data.forEach((element) => {
@@ -126,6 +131,8 @@ function SubstanceChart({ mode }) {
         barData[dayIndex].value = element.smokedCigarettes;
         totalConsumption += element.smokedCigarettes;
         if (element.smokedCigarettes === 0) noSubstanceDays += 1;
+        if (element.smokedCigarettes > maxConsumed)
+          maxConsumed = element.smokedCigarettes;
       });
     } else {
       data.forEach((element) => {
@@ -133,12 +140,15 @@ function SubstanceChart({ mode }) {
         barData[dayIndex].value = element.numberOfConsumedDrinks;
         totalConsumption += element.numberOfConsumedDrinks;
         if (element.numberOfConsumedDrinks === 0) noSubstanceDays += 1;
+        if (element.numberOfConsumedDrinks > maxConsumed)
+          maxConsumed = element.numberOfConsumedDrinks;
       });
     }
 
     let newAverage = (totalConsumption / 7).toFixed(1);
     setAverage(newAverage);
     setSubstanceFreeDays(noSubstanceDays);
+    setMaxConsumedWeek(maxConsumed);
     return barData;
   };
 
@@ -260,7 +270,7 @@ function SubstanceChart({ mode }) {
           xAxisThickness={0}
           yAxisTextStyle={{ color: "lightgrey" }}
           stepValue={2}
-          maxValue={12}
+          maxValue={maxConsumedWeek}
           noOfSections={1}
           showValuesAsTopLabel
           topLabelTextStyle={{ color: "grey", fontSize: 10 }}

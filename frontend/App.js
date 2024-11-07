@@ -19,7 +19,7 @@ import BottomTab from "./components/Navigation/BottomTab";
 import WizzardStack from "./components/Navigation/WizzardStack";
 //SplashScreen.preventAutoHideAsync();
 import { registerForPushNotificationsAsync } from "./util/notifications";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 const Stack = createNativeStackNavigator();
 
 function Navigation() {
@@ -82,7 +82,7 @@ export default function App() {
   const [expoPushToken, setExpoPushToken] = useState("");
 
   useEffect(() => {
-    console.log(BACKEND_URL);
+    console.log(EXPO_PUBLIC_API_URL);
     if (loaded || error) {
       SplashScreen.hideAsync();
     }

@@ -59,11 +59,7 @@ const questions = [
     type: "choice",
     question:
       "What are your thoughts regarding the importance of physical activity?",
-    options: [
-      "No strong opinion",
-      "Very important",
-      "There are more significant factors",
-    ],
+    options: ["No strong opinion", "Very important", "Not so important"],
   },
   {
     id: 6,

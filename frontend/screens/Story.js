@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ScrollView } from "react-native";
 import { Colors } from "../constants/Colors";
 import ZenithIcon from "../assets/svgs/StoryIcons/Zenith.svg";
 import TulipsPlanet from "../assets/svgs/StoryIcons/TulipsPlanet.svg";
@@ -10,10 +10,11 @@ import FlatButton from "../ui/ButtonFlat";
 import BackgroundStarsBig from "../assets/svgs/BackgroundStarsBig.svg";
 import { useContext } from "react";
 import { AnswersContext } from "../store/answers-context";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../store/auth-context";
-const backendURL = `${BACKEND_URL}/habits`;
+const backendURL = `${EXPO_PUBLIC_API_URL}/habits`;
+import axios from "axios";
 
 const story = [
   {
@@ -154,14 +155,14 @@ function Story({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{storyline.title}</Text>
         <Text style={styles.plot}>{storyline.plot}</Text>
       </View>
       {storyline.background}
       <FlatButton onPress={nextScreenHandler}>{buttonText} &rarr;</FlatButton>
-    </View>
+    </ScrollView>
   );
 }
 

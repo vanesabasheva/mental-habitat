@@ -5,7 +5,7 @@ import { Colors } from "../../../constants/Colors";
 
 export const WEEK_DAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
-function SelectWeekDays({ onChange, setDays }) {
+function SelectWeekDays({ onChange }) {
   let days = [];
   const [selectedDays, setSelectedDays] = useState(days);
 

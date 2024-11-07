@@ -9,17 +9,18 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FDFAFF"
     },
     "ios": {
-      "buildNumber":"1.0.0",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#FDFAFF"
+      },
+      "package": "com.vanesa.basheva.MentalHabitat"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,6 +42,11 @@
         }
       ],
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6bd34235-8609-4e58-8761-c1812683c0cc"
+      }
+    }
   }
 }

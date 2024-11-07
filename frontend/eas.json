@@ -1,0 +1,38 @@
+{
+  "cli": {
+    "version": ">= 13.0.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://space-habit-app-99b90a567928.herokuapp.com"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+         "EXPO_PUBLIC_API_URL": "https://space-habit-app-99b90a567928.herokuapp.com"
+      }
+    },
+    "test": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:3000"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

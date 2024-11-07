@@ -24,14 +24,18 @@ import NewDietHabitForm from "../components/Habits/NewHabit/FormDiet";
 import { deviceHeight, deviceWidth } from "../constants/Dimensions";
 import axios from "axios";
 import { AuthContext } from "../store/auth-context";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
+import { StatsContext } from "../store/stats-context";
 
 const emulatorBaseURL = "http://10.0.2.2:3000/habits";
-const backendURL = BACKEND_URL + "/habits";
+const backendURL = EXPO_PUBLIC_API_URL + "/habits";
 
 function HabitsScreen() {
   const { token } = useContext(AuthContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const statsCtx = useContext(StatsContext);
+  const categories = statsCtx.categories;
+  console.log(categories);
 
   // Habits State Management
   const [selectedDate, setSelectedDate] = useState(
@@ -66,6 +70,12 @@ function HabitsScreen() {
       const response = await axios.post(backendURL, habitObject, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!categories.includes(habitObject.category)) {
+        console.log(habitObject.category);
+        const updatedCategories = [...categories, habitObject.category];
+
+        statsCtx.setAllCategories(updatedCategories);
+      }
 
       await fetchHabits();
 
@@ -88,6 +98,22 @@ function HabitsScreen() {
         const filteredHabits = prevHabits[selectedDate].filter(
           (item) => item._id !== id
         );
+
+        const deletedHabit = prevHabits[selectedDate].find(
+          (item) => item._id === id
+        );
+        const currentCategory = deletedHabit.category;
+        console.log("Deleting habit..." + JSON.stringify(deletedHabit));
+        const isCategoryPresent = filteredHabits.some(
+          (habit) => habit.category === currentCategory
+        );
+        console.log(isCategoryPresent);
+        if (!isCategoryPresent) {
+          statsCtx.setAllCategories((prevCategories) =>
+            prevCategories.filter((category) => category !== currentCategory)
+          );
+        }
+
         return { [selectedDate]: filteredHabits };
       });
     } catch (error) {

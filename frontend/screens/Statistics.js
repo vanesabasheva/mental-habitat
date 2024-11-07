@@ -1,11 +1,24 @@
 import { View, Text, StyleSheet, SafeAreaView, ScrollView } from "react-native";
 import { Colors } from "../constants/Colors";
-import { BarChart } from "react-native-gifted-charts";
 import ExerciseChart from "../components/Statistics/ExerciseChart";
 import DietChart from "../components/Statistics/DietChart";
 import SubstanceChart from "../components/Statistics/SubstanceChart";
+import { useContext } from "react";
+import { StatsContext } from "../store/stats-context";
 
 function StatisticsScreen() {
+  const statsCtx = useContext(StatsContext);
+  const categories = statsCtx.categories;
+  const stats = statsCtx.stats;
+  console.log(stats);
+
+  const hasDiet = categories.includes("Diet");
+  const hasAlcohol = categories.includes("Alcohol");
+  const hasSmoking = categories.includes("Smoking");
+  const hasExercise = categories.includes("Exercise");
+
+  console.log(hasAlcohol);
+
   return (
     <>
       <View style={styles.container}>
@@ -13,10 +26,10 @@ function StatisticsScreen() {
           <Text style={styles.headerText}>Your stats</Text>
         </View>
         <ScrollView>
-          <DietChart />
-          <SubstanceChart mode="Smoking" />
-          <SubstanceChart mode="Alcohol" />
-          <ExerciseChart />
+          {hasDiet && <DietChart />}
+          {hasSmoking && <SubstanceChart mode="Smoking" />}
+          {hasAlcohol && <SubstanceChart mode="Alcohol" />}
+          {hasExercise && <ExerciseChart />}
         </ScrollView>
       </View>
     </>

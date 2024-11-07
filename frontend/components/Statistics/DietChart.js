@@ -3,10 +3,11 @@ import { Colors } from "../../constants/Colors";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../store/auth-context";
-import { BACKEND_URL } from "@env";
+import { StatsContext } from "../../store/stats-context";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import IconButton from "../../ui/ButtonIcon";
-const backendUrl = BACKEND_URL + "/statistics/diet";
+const backendUrl = EXPO_PUBLIC_API_URL + "/statistics/diet";
 import axios from "axios";
 
 const stackDietData = [
@@ -67,6 +68,10 @@ function DietChart() {
 
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
+  const statsCtx = useContext(StatsContext);
+  const stats = statsCtx.stats;
+
+  console.log("in diet Chart" + JSON.stringify(stats));
 
   const fetchData = async (currentDate) => {
     if (timePeriod === "week") {
@@ -86,7 +91,7 @@ function DietChart() {
 
   useEffect(() => {
     fetchData(currentDate);
-  }, [typeData]);
+  }, [typeData, stats]);
 
   const getWeekRange = (date) => {
     const startOfWeek = new Date(

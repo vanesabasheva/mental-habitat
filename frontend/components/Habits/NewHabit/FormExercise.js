@@ -165,10 +165,7 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
       </View>
       <View>
         <Text style={styles.label}>Days of the week</Text>
-        <SelectWeekDays
-          onChange={selectedDaysHandler}
-          setDays={habit.selectedDaysOfWeek}
-        />
+        <SelectWeekDays onChange={selectedDaysHandler} />
         {errors.daysError && (
           <Text style={styles.errorText}>{errors.daysError}</Text>
         )}

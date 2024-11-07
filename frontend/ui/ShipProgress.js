@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { Colors } from "../constants/Colors";
 import Button from "./Button";
 import ProgressBar from "./ProgressBar";
@@ -7,11 +7,12 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Spaceship from "../assets/svgs/Spaceship.svg";
 import { deviceWidth, deviceHeight } from "../constants/Dimensions";
-import { BACKEND_URL } from "@env";
+import { EXPO_PUBLIC_API_URL } from "@env";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../store/auth-context";
-const backendURL = BACKEND_URL + "/game";
+import { StatsContext } from "../store/stats-context";
+const backendURL = EXPO_PUBLIC_API_URL + "/game";
 
 function ShipProgress({
   stats,
@@ -22,6 +23,8 @@ function ShipProgress({
   const keysArray = Object.keys(stats);
   const authCtx = useContext(AuthContext);
   const token = authCtx.token;
+  const statsCtx = useContext(StatsContext);
+  const currentLevel = statsCtx.currentLevel;
 
   let progress = 0;
   keysArray.forEach((key) => {
@@ -49,23 +52,36 @@ function ShipProgress({
       console.log(response.data.currentLevel);
 
       const levelProgress = response.data.levelProgress;
-      const currentLevel = response.data.currentLevel;
+      const updatedLevel = response.data.currentLevel;
       setLevelProgress(levelProgress);
-      setCurrentLevel(currentLevel);
+      if (currentLevel != updatedLevel) {
+        console.log("New Level Reached: " + updatedLevel);
+        Alert.alert(
+          "New Planet Reached!",
+          `Congratulations, you've reached Level ${updatedLevel}. It's time to explore the new planet!`,
+          [
+            {
+              text: "Close",
+              onPress: () => console.log("Close Pressed"),
+            },
+          ]
+        );
+        setCurrentLevel(updatedLevel);
+      }
     } catch (error) {
       console.log(error);
     }
   }
   const isSmokingPresent = categories.some(
-    (category) => category._id === "Smoking"
+    (category) => category === "Smoking"
   );
   const isExercisePresent = categories.some(
-    (category) => category._id === "Exercise"
+    (category) => category === "Exercise"
   );
   const isAlcoholPresent = categories.some(
-    (category) => category._id === "Alcohol"
+    (category) => category === "Alcohol"
   );
-  const isDietPresent = categories.some((category) => category._id === "Diet");
+  const isDietPresent = categories.some((category) => category === "Diet");
 
   return (
     <View style={{ alignItems: "center" }}>

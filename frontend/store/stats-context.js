@@ -33,7 +33,6 @@ function StatsContextProvider({ children }) {
       ...prevStats,
       [updatedStat]: prevStats[updatedStat] + increment,
     }));
-    console.log("After" + JSON.stringify(stats));
   };
 
   const setAllStats = (newStats) => {

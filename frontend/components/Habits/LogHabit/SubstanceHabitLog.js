@@ -64,29 +64,8 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
   }
 
   function increase() {
-    setConsumedToday(async (prevState) => {
+    setConsumedToday((prevState) => {
       const newState = (prevState += 1);
-      if (mode === "Smoking") {
-        onLog({
-          numberOfSmokedCigarettes: newState,
-          notes: notes,
-        });
-      } else {
-        onLog({
-          numberOfConsumedDrinks: newState,
-          notes: notes,
-        });
-      }
-
-      if (newState >= goal) {
-        await notifyUserForGoal(
-          newState,
-          habitEntry,
-          consumedText,
-          goal,
-          habitEntry.day
-        );
-      }
 
       return newState;
     });
@@ -96,21 +75,35 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
     setConsumedToday((prevState) => {
       const newState = prevState > 0 ? prevState - 1 : 0;
 
-      if (mode === "Smoking") {
-        onLog({
-          numberOfSmokedCigarettes: newState,
-          notes: notes,
-        });
-      } else {
-        onLog({
-          numberOfConsumedDrinks: newState,
-          notes: notes,
-        });
-      }
-
       return newState;
     });
     //  onLog({ consumedToday: consumedToday, notes: notes });
+  }
+
+  async function logHabit() {
+    console.log("Logging habit..." + mode + " " + consumedToday);
+
+    if (consumedToday >= goal) {
+      await notifyUserForGoal(
+        consumedToday,
+        habitEntry,
+        consumedText,
+        goal,
+        habitEntry.day
+      );
+    }
+
+    if (mode === "Smoking") {
+      onLog({
+        numberOfSmokedCigarettes: consumedToday,
+        notes: notes,
+      });
+    } else {
+      onLog({
+        numberOfConsumedDrinks: consumedToday,
+        notes: notes,
+      });
+    }
   }
 
   return (
@@ -205,7 +198,7 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
           style={{ padding: 10 }}
         />
       </View>
-      <Button onPress={() => onLog({ notes: notes })}>Save</Button>
+      <Button onPress={logHabit}>Save</Button>
     </View>
   );
 }

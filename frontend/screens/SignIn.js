@@ -5,7 +5,7 @@ import AuthForm from "../components/Auth/AuthForm";
 import FlatButton from "../ui/ButtonFlat";
 import LoadingOverlay from "../ui/LoadingOverlay";
 import { signInUser } from "../util/auth";
-
+import { Alert } from "react-native";
 function SignInScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
 
