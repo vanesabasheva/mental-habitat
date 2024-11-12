@@ -54,14 +54,30 @@ exports.getSmokingStats = async (req, res) => {
 
     let data = [];
 
-    for (let index = 0; index < smokingEntries.length; index++) {
-      const element = smokingEntries[index];
-      data[index] = {
-        day: index,
-        smokedCigarettes: element.details.numberOfSmokedCigarettes,
+    for (let index = 1; index <= 7; index++) {
+      let element;
+      for (
+        let entriesIndex = 0;
+        entriesIndex < smokingEntries.length;
+        entriesIndex++
+      ) {
+        element = smokingEntries[entriesIndex];
+        if (element.day.getDay() === index) {
+          break;
+        }
+        element = undefined;
+      }
+
+      data[index - 1] = {
+        day: index - 1,
+        smokedCigarettes: element
+          ? element.details.numberOfSmokedCigarettes
+          : 0,
       };
     }
     // for each day index [{day: 0 smokedCigarettes: 0}, {day: 1, smokedCigarettes: 1}, {day: 2, smokedCigarettes: 4} ...]
+    console.log("Final Data:");
+    console.log(data);
     return res.status(200).json(data);
   } catch (error) {
     handleError(res, error, "get_smoking_stats");
@@ -109,11 +125,24 @@ exports.getAlcoholStats = async (req, res) => {
 
     let data = [];
 
-    for (let index = 0; index < alcoholEntries.length; index++) {
-      const element = alcoholEntries[index];
-      data[index] = {
-        day: index,
-        numberOfConsumedDrinks: element.details.numberOfConsumedDrinks,
+    for (let index = 1; index <= 7; index++) {
+      let element;
+      for (
+        let entriesIndex = 0;
+        entriesIndex < alcoholEntries.length;
+        entriesIndex++
+      ) {
+        element = alcoholEntries[entriesIndex];
+        if (element.day.getDay() === index) {
+          break;
+        }
+        element = undefined;
+      }
+      data[index - 1] = {
+        day: index - 1,
+        numberOfConsumedDrinks: element
+          ? element.details.numberOfConsumedDrinks
+          : 0,
       };
     }
 
