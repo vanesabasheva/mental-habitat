@@ -122,19 +122,21 @@ function HabitsScreen() {
     }
   }
 
-  async function editHabitHandler(habit) {
-    console.log(habit);
+  async function editHabitHandler() {
+    console.log("In the parent screen...");
+    await fetchHabits();
   }
 
   const fetchHabits = async () => {
-    console.log("Fetching habits... " + backendURL);
     try {
+      console.log("Fetching habits... " + backendURL);
       const response = await axios.get(`${backendURL}/${selectedDate}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setHabitsForDate({ [selectedDate]: response.data.habits });
+      console.log(response.data.habits);
     } catch (error) {
       console.log(error);
     }
@@ -163,7 +165,7 @@ function HabitsScreen() {
               setModalVisible(!modalVisible);
             }}>
             <ScrollView
-              style={{ marginTop: deviceHeight / 6 }}
+              style={{ marginTop: deviceHeight / 8 }}
               automaticallyAdjustKeyboardInsets={true}>
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
@@ -211,6 +213,7 @@ function HabitsScreen() {
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           onDeleteHabit={deleteHabitHandler}
+          onEditHabit={editHabitHandler}
         />
       </SafeAreaView>
     </>
@@ -240,7 +243,7 @@ const styles = StyleSheet.create({
     //marginTop: 22,
   },
   modalView: {
-    height: deviceHeight / 1.2,
+    height: deviceHeight / 1.1,
     width: deviceWidth,
     margin: 0,
     backgroundColor: "white",

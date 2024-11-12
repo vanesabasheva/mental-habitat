@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Dimensions,
   Modal,
+  ScrollView,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Colors } from "../../../constants/Colors";
@@ -56,7 +57,7 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
       selectedActivity === "Walking"
     ) {
       errorWithDistance =
-        distance === "0" ? "Diistance for activity required." : null;
+        distance === "0" ? "Distance for activity required." : null;
     }
     const newErrors = {
       activityError:
@@ -86,7 +87,7 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.label}>Activity</Text>
       <Button
         newStyles={{
@@ -181,7 +182,7 @@ function NewExerciseHabitForm({ habit, buttonLabel, onAddNewHabit }) {
         onPress={addNewHabitHandler}>
         {buttonLabel ? buttonLabel : "Add"}
       </Button>
-    </View>
+    </ScrollView>
   );
 }
 

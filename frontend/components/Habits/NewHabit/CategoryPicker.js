@@ -1,6 +1,7 @@
 import { View, StyleSheet, Dimensions, Text } from "react-native";
 import { Colors } from "../../../constants/Colors";
 import Button from "../../../ui/Button";
+import { deviceHeight } from "../../../constants/Dimensions";
 
 const CATEGORIES = ["Smoking", "Exercise", "Alcohol", "Diet"];
 
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    margin: 10,
+    margin: deviceHeight * 0.007,
   },
   buttonText: {
     fontFamily: "robotomono-bold",

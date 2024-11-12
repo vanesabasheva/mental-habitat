@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../store/auth-context";
 const backendURL = `${EXPO_PUBLIC_API_URL}/habits`;
 import axios from "axios";
+import { deviceHeight, deviceWidth } from "../constants/Dimensions";
 
 const story = [
   {
@@ -155,7 +156,7 @@ function Story({ route, navigation }) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{storyline.title}</Text>
         <Text style={styles.plot}>{storyline.plot}</Text>
@@ -168,12 +169,13 @@ function Story({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     backgroundColor: Colors.primaryBackgroundLight,
     paddingHorizontal: 24,
     paddingTop: 32,
     gap: 12,
+    paddingBottom: deviceHeight * 0.05,
   },
   textContainer: {
     zIndex: 10,

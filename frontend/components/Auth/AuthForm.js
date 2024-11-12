@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import Button from "../../ui/Button";
 import Input from "./Input";
+import { DismissKeyboard } from "../../screens/QuestionsScreen";
 
 function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   const [enteredEmail, setEnteredEmail] = useState("");
@@ -35,38 +36,40 @@ function AuthForm({ isLogin, onSubmit, credentialsInvalid }) {
   }
 
   return (
-    <View style={styles.form}>
-      <View>
-        {!isLogin && (
+    <ScrollView automaticallyAdjustKeyboardInsets={true} style={styles.form}>
+      <DismissKeyboard>
+        <View>
+          {!isLogin && (
+            <Input
+              label="Full Name"
+              onUpdateValue={updateInputValueHandler.bind(this, "fullName")}
+              value={fullName}
+            />
+          )}
           <Input
-            label="Full Name"
-            onUpdateValue={updateInputValueHandler.bind(this, "fullName")}
-            value={fullName}
+            label="Email"
+            onUpdateValue={updateInputValueHandler.bind(this, "email")}
+            value={enteredEmail}
+            keyboardType="email-address"
+            isInvalid={emailIsInvalid}
           />
-        )}
-        <Input
-          label="Email"
-          onUpdateValue={updateInputValueHandler.bind(this, "email")}
-          value={enteredEmail}
-          keyboardType="email-address"
-          isInvalid={emailIsInvalid}
-        />
 
-        <Input
-          label="Password"
-          onUpdateValue={updateInputValueHandler.bind(this, "password")}
-          secure
-          value={enteredPassword}
-          isInvalid={passwordIsInvalid}
-        />
+          <Input
+            label="Password"
+            onUpdateValue={updateInputValueHandler.bind(this, "password")}
+            secure
+            value={enteredPassword}
+            isInvalid={passwordIsInvalid}
+          />
 
-        <View style={styles.buttons}>
-          <Button onPress={submitHandler}>
-            {isLogin ? "Log In" : "Sign Up"}
-          </Button>
+          <View style={styles.buttons}>
+            <Button onPress={submitHandler}>
+              {isLogin ? "Log In" : "Sign Up"}
+            </Button>
+          </View>
         </View>
-      </View>
-    </View>
+      </DismissKeyboard>
+    </ScrollView>
   );
 }
 

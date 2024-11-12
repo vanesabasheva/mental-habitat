@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primaryBackgroundLight,
-    // paddingTop: 70,
+    paddingTop: deviceHeight * 0.1,
     gap: 50,
     padding: 32,
     alignItems: "center",
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 8,
     marginHorizontal: 20,
-    top: deviceHeight * 0.05,
+    top: deviceHeight * 0.1,
   },
   title: {
     fontSize: 24,
@@ -101,11 +101,11 @@ const styles = StyleSheet.create({
   planetRowContainer: {
     flexDirection: "row", // Align children in a row
     flexWrap: "wrap", // Allow multiple rows
-    justifyContent: "space-evenly", // Evenly space items within each row
+    justifyContent: "space-between", // Evenly space items within each row
     alignItems: "flex-start",
   },
   planetContainer: {
-    width: "40%", // Each planet takes half the row width
+    width: "45%", // Each planet takes half the row width
     alignItems: "center", // Center content horizontally
     marginBottom: 0, // Margin between rows
     //marginHorizontal: 16,

@@ -63,7 +63,7 @@ function SubstanceChart({ mode }) {
       setCurrentDate(() => new Date(startDate));
       setCurrentEndDate(() => new Date(endDate));
       const data = await fetchWeeklyData(startDate, endDate);
-
+      console.log("Final Data");
       if (data.error) {
         // TODO: handle errors
         return;
@@ -114,7 +114,6 @@ function SubstanceChart({ mode }) {
     const frontColor =
       mode === "Smoking" ? Colors.primarySmoking : Colors.primaryAlcohol;
 
-    console.log("Mode: and color" + frontColor + mode);
     let barData = days.map((label) => ({
       label,
       value: 0,
@@ -124,7 +123,7 @@ function SubstanceChart({ mode }) {
     let totalConsumption = 0;
     let noSubstanceDays = 0;
     let maxConsumed = 0;
-
+    //console.log("In Process weekly data: " + JSON.stringify(data));
     if (mode === "Smoking") {
       data.forEach((element) => {
         const dayIndex = element.day;

@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { Colors } from "../../constants/Colors";
 import Checkbox from "react-native-community-checkbox";
 import SmokingIcon from "../../assets/svgs/HabitsIcons/SmokingIcon.svg";
@@ -11,6 +17,9 @@ import RunningIcon from "../../assets/svgs/HabitsIcons/RunningIcon.svg";
 import AlcoholIcon from "../../assets/svgs/HabitsIcons/AlcoholIcon.svg";
 import DietIcon from "../../assets/svgs/HabitsIcons/DietIcon.svg";
 import IconButton from "../../ui/ButtonIcon";
+import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../../store/auth-context";
 import { StatsContext } from "../../store/stats-context";
@@ -31,6 +40,7 @@ import {
   cancelNotificationById,
 } from "../../util/notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "../../ui/Toast";
 
 const getNotificationId = (habitEntryId, day) => `habit-${habitEntryId}-${day}`;
 
@@ -70,7 +80,7 @@ const scheduleHabitReminder = async (
   }
 };
 
-function HabitItem({ habit, day, onDeleteHabit }) {
+function HabitItem({ habit, day, onDeleteHabit, onEditHabit }) {
   const { _id, title, details, habitType, selectedDaysOfWeek, category } =
     habit;
   const { numberOfCigarettes, duration, distance, numberOfDrinks } = details;
@@ -81,6 +91,15 @@ function HabitItem({ habit, day, onDeleteHabit }) {
   const [habitEntry, setHabitEntry] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [logModalVisible, setLogModalVisible] = useState(false);
+  const [toast, setToast] = useState(false);
+  const [toastText, setToastText] = useState("");
+  const [toastIcon, setToastIcon] = useState(
+    <MaterialCommunityIcons
+      name="engine-outline"
+      size={24}
+      color={Colors.primaryBold}
+    />
+  );
   const token = authCtx.token;
 
   let descriptionBasedOnCategory;
@@ -99,7 +118,10 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       text = "Cigarette/day";
     }
     descriptionBasedOnCategory = (
-      <Text style={[{ fontFamily: "robotomono-regular" }, checkedTextStyle]}>
+      <Text
+        adjustsFontSizeToFit={true}
+        numberOfLines={1}
+        style={[{ fontFamily: "robotomono-regular" }, checkedTextStyle]}>
         {numberOfCigarettes} {text}
       </Text>
     );
@@ -114,14 +136,22 @@ function HabitItem({ habit, day, onDeleteHabit }) {
   } else if (category === "Exercise") {
     descriptionBasedOnCategory = (
       <View>
-        <Text style={[styles.daysOfWeekText, checkedTextStyle]}>
+        <Text
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          style={[styles.daysOfWeekText, checkedTextStyle]}>
           {selectedDaysOfWeek.join(", ")}
         </Text>
-        <Text style={[checkedTextStyle, { fontFamily: "robotomono-regular" }]}>
+        <Text
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          style={[checkedTextStyle, { fontFamily: "robotomono-regular" }]}>
           Duration: {duration} min
         </Text>
         {distance ? (
           <Text
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
             style={[{ fontFamily: "robotomono-regular" }, checkedTextStyle]}>
             Distance: {distance} km
           </Text>
@@ -191,7 +221,10 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       text = "Drink/day";
     }
     descriptionBasedOnCategory = (
-      <Text style={[{ fontFamily: "robotomono-regular" }, checkedTextStyle]}>
+      <Text
+        adjustsFontSizeToFit={true}
+        numberOfLines={1}
+        style={[{ fontFamily: "robotomono-regular" }, checkedTextStyle]}>
         {numberOfDrinks} {text}
       </Text>
     );
@@ -206,7 +239,10 @@ function HabitItem({ habit, day, onDeleteHabit }) {
   } else if (category === "Diet") {
     descriptionBasedOnCategory = (
       <View>
-        <Text style={[styles.daysOfWeekText, checkedTextStyle]}>
+        <Text
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          style={[styles.daysOfWeekText, checkedTextStyle]}>
           {selectedDaysOfWeek.join(", ")}
         </Text>
       </View>
@@ -243,6 +279,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       console.log(
         "Checking habit... " + EXPO_PUBLIC_API_URL + "/habits/habitEntry"
       );
+
       const response = await axios.patch(
         `${EXPO_PUBLIC_API_URL}/habits/habitEntry/${habitEntryId}`,
         {
@@ -259,8 +296,53 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       console.log(response.data);
       const stats = response.data.stats;
       statsCtx.incrementStat(stats.updatedStat, stats.increment);
+      // updatedStat: fuel, increment: increment
+      setToastText(stats.increment);
+      switch (stats.updatedStat) {
+        case "engines":
+          setToastIcon(
+            <MaterialCommunityIcons
+              name="engine-outline"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+          break;
+        case "energy":
+          setToastIcon(
+            <SimpleLineIcons
+              name="energy"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
 
+          break;
+        case "grip":
+          setToastIcon(
+            <FontAwesome5
+              name="grip-lines"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+          break;
+        case "fuel":
+          setToastIcon(
+            <MaterialCommunityIcons
+              name="fuel"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+          break;
+
+        default:
+          break;
+      }
+      setToast(true);
       const notificationId = getNotificationId(habitEntry._id, day);
+
       await cancelNotificationById(notificationId);
     } catch (error) {
       console.log(error);
@@ -272,6 +354,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
     setIsHabitChecked(false);
     try {
       console.log(habit._id);
+
       const response = await axios.patch(
         `${EXPO_PUBLIC_API_URL}/habits/habitEntry/${habitEntryId}`,
         {
@@ -287,6 +370,51 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       console.log(response.data);
       const stats = response.data.stats;
       statsCtx.incrementStat(stats.updatedStat, stats.increment);
+
+      setToastText(stats.increment);
+      switch (stats.updatedStat) {
+        case "engines":
+          setToastIcon(
+            <MaterialCommunityIcons
+              name="engine-outline"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+          break;
+        case "energy":
+          setToastIcon(
+            <SimpleLineIcons
+              name="energy"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+
+          break;
+        case "grip":
+          setToastIcon(
+            <FontAwesome5
+              name="grip-lines"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+          break;
+        case "fuel":
+          setToastIcon(
+            <MaterialCommunityIcons
+              name="fuel"
+              size={24}
+              color={Colors.primaryBold}
+            />
+          );
+          break;
+
+        default:
+          break;
+      }
+      setToast(true);
 
       //await scheduleHabitReminder(habitEntry, day, true);
     } catch (error) {
@@ -452,7 +580,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
   async function editHabitHandler(habit) {
     const { ...updateData } = habit;
     console.log("Starting editing habit..." + JSON.stringify(updateData));
-    console.log(habit._id);
+    console.log(_id);
     try {
       const response = await axios.put(
         `${EXPO_PUBLIC_API_URL}/habits/${_id}`,
@@ -468,6 +596,7 @@ function HabitItem({ habit, day, onDeleteHabit }) {
       console.error("Failed to update habit", error);
     }
     console.log("Editing habit" + JSON.stringify(habit));
+    await onEditHabit();
     setModalVisible(false);
   }
 
@@ -498,100 +627,106 @@ function HabitItem({ habit, day, onDeleteHabit }) {
   }
 
   return (
-    <TouchableOpacity onPress={() => openLogModal(habit)}>
-      <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>
-        <View
-          style={[styles.container, { backgroundColor: habitCategoryColor }]}>
+    <>
+      {toast && <Toast setToast={setToast} icon={toastIcon} text={toastText} />}
+      <TouchableOpacity onPress={() => openLogModal(habit)}>
+        <View style={{ backgroundColor: Colors.primaryBackgroundLight }}>
           <View
-            style={{
-              position: "absolute",
-              padding: 10,
-              top: 18,
-              borderRadius: 50,
-            }}>
-            <IconButton
-              icon="create-outline"
-              size={24}
-              color={isHabitChecked ? Colors.primaryGrey : "grey"}
-              onPress={openModal}
-            />
-          </View>
-          <View style={{ marginLeft: 32 }}>{icon}</View>
-          <View style={{ gap: 8, maxWidth: "40%" }}>
-            <View>
-              <Text style={[styles.title, checkedTextStyle]}>{title}</Text>
-              {descriptionBasedOnCategory}
-            </View>
-          </View>
-          <View style={styles.container}>
-            {isHabitChecked ? (
-              <View style={{ position: "absolute", right: deviceWidth * 0.06 }}>
-                <Ionicons name="checkmark-outline" size={12} color="black" />
-              </View>
-            ) : null}
-            <View style={{ borderRadius: 50, overflow: "hidden" }}>
-              <Checkbox
-                isChecked={isHabitChecked}
-                setChecked={toggleCheckbox}
-                styles={stylesCheckbox}
-              />
-            </View>
-          </View>
-        </View>
-
-        {/* EDIT HABIT MODAL */}
-        <CustomModal
-          title={"Edit habit"}
-          description={"Try to frame your habit as a small achievable action "}
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              gap: deviceHeight * 0.025,
-            }}>
-            {icon}
-            {habitForm}
-            <IconButton
-              icon={"trash"}
-              color={Colors.primaryBold}
-              size={24}
-              onPress={() => {
-                deleteHabitHandler(habit._id);
-              }}
-            />
-          </View>
-        </CustomModal>
-
-        {/* LOG HABIT MODAL */}
-        <CustomModal
-          title={"Habit Log"}
-          description={habit.title}
-          modalVisible={logModalVisible}
-          setModalVisible={setLogModalVisible}>
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              gap: deviceHeight * 0.025,
-            }}>
+            style={[styles.container, { backgroundColor: habitCategoryColor }]}>
             <View
               style={{
-                backgroundColor: Colors.primaryBackgroundLight,
-                width: deviceWidth * 0.7,
-                alignItems: "center",
+                position: "absolute",
+                padding: 10,
+                top: 18,
+                borderRadius: 50,
+              }}>
+              <IconButton
+                icon="create-outline"
+                size={24}
+                color={isHabitChecked ? Colors.primaryGrey : "grey"}
+                onPress={openModal}
+              />
+            </View>
+            <View style={{ marginLeft: 32 }}>{icon}</View>
+            <View style={{ gap: 8, maxWidth: "40%" }}>
+              <View>
+                <Text style={[styles.title, checkedTextStyle]}>{title}</Text>
+                {descriptionBasedOnCategory}
+              </View>
+            </View>
+            <View style={styles.container}>
+              {isHabitChecked ? (
+                <View
+                  style={{ position: "absolute", right: deviceWidth * 0.06 }}>
+                  <Ionicons name="checkmark-outline" size={12} color="black" />
+                </View>
+              ) : null}
+              <View style={{ borderRadius: 50, overflow: "hidden" }}>
+                <Checkbox
+                  isChecked={isHabitChecked}
+                  setChecked={toggleCheckbox}
+                  styles={stylesCheckbox}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* EDIT HABIT MODAL */}
+          <CustomModal
+            title={"Edit habit"}
+            description={
+              "Try to frame your habit as a small achievable action "
+            }
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}>
+            <ScrollView
+              contentContainerStyle={{
                 justifyContent: "center",
-                padding: 20,
-                borderRadius: 32,
+                alignItems: "center",
+                gap: deviceHeight * 0.025,
               }}>
               {icon}
+              {habitForm}
+              <IconButton
+                icon={"trash"}
+                color={Colors.primaryBold}
+                size={24}
+                onPress={() => {
+                  deleteHabitHandler(habit._id);
+                }}
+              />
+            </ScrollView>
+          </CustomModal>
+
+          {/* LOG HABIT MODAL */}
+          <CustomModal
+            title={"Habit Log"}
+            description={habit.title}
+            modalVisible={logModalVisible}
+            setModalVisible={setLogModalVisible}>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                gap: deviceHeight * 0.025,
+              }}>
+              <View
+                style={{
+                  backgroundColor: Colors.primaryBackgroundLight,
+                  width: deviceWidth * 0.7,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 20,
+                  borderRadius: 32,
+                }}>
+                {icon}
+              </View>
+              {logHabitForm}
             </View>
-            {logHabitForm}
-          </View>
-        </CustomModal>
-      </View>
-    </TouchableOpacity>
+          </CustomModal>
+        </View>
+      </TouchableOpacity>
+    </>
   );
 }
 

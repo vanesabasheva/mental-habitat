@@ -26,10 +26,10 @@ function StatisticsScreen() {
           <Text style={styles.headerText}>Your stats</Text>
         </View>
         <ScrollView>
-          {hasDiet && <DietChart />}
           {hasSmoking && <SubstanceChart mode="Smoking" />}
-          {hasAlcohol && <SubstanceChart mode="Alcohol" />}
           {hasExercise && <ExerciseChart />}
+          {hasAlcohol && <SubstanceChart mode="Alcohol" />}
+          {hasDiet && <DietChart />}
         </ScrollView>
       </View>
     </>

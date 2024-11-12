@@ -107,7 +107,7 @@ function SubstanceHabitLog({ mode, habitEntry, onLog }) {
   }
 
   return (
-    <View style={{ alignItems: "center" }}>
+    <View style={{ alignItems: "center", paddingBottom: deviceHeight * 0.3 }}>
       <View style={{ flexDirection: "row", gap: 12 }}>
         <Text style={{ fontFamily: "robotomono-regular", marginBottom: 12 }}>
           {" "}

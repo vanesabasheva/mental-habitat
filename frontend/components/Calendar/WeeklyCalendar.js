@@ -10,6 +10,7 @@ function WeeklyAgenda({
   selectedDate,
   setSelectedDate,
   onDeleteHabit,
+  onEditHabit,
 }) {
   const CALENDAR_THEME = {
     calendarBackground: Colors.primaryBackgroundLight,
@@ -44,9 +45,9 @@ function WeeklyAgenda({
     return <View styles={{ backgroundColor: Colors.primaryBackgroundLight }} />;
   };
 
-  function editHabitHandler(habit) {
-    onEditHabit(habit);
-    console.log("Editing habit" + habit);
+  async function editHabitHandler() {
+    console.log("Editing habit... updating UI initiated");
+    await onEditHabit();
   }
 
   async function deleteHabitHandler(id) {
@@ -69,6 +70,7 @@ function WeeklyAgenda({
         habit={item}
         day={selectedDate}
         onDeleteHabit={deleteHabitHandler}
+        onEditHabit={editHabitHandler}
       />
     );
   };

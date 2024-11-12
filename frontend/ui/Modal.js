@@ -20,7 +20,6 @@ function CustomModal({
   modalVisible,
   setModalVisible,
 }) {
-  const [assets, error] = useAssets([require("../assets/imgs/level1.png")]);
   return (
     <Modal
       animationType="slide"
@@ -31,7 +30,7 @@ function CustomModal({
         setModalVisible(!modalVisible);
       }}>
       <ScrollView
-        style={{ marginTop: deviceHeight / 6 }}
+        contentContainerStyle={{ marginTop: deviceHeight / 6 }}
         automaticallyAdjustKeyboardInsets={true}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
     //marginTop: 22,
   },
   modalView: {
-    height: deviceHeight / 1.2,
+    //height: deviceHeight / 1.2,
     width: deviceWidth,
     margin: 0,
     backgroundColor: "white",

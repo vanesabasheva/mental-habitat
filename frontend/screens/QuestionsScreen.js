@@ -13,7 +13,7 @@ import Button from "../ui/Button";
 import { AnswersContext } from "../store/answers-context";
 import { deviceWidth, deviceHeight } from "../constants/Dimensions";
 
-const DismissKeyboard = ({ children }) => (
+export const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     {children}
   </TouchableWithoutFeedback>
