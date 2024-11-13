@@ -76,8 +76,6 @@ exports.getSmokingStats = async (req, res) => {
       };
     }
     // for each day index [{day: 0 smokedCigarettes: 0}, {day: 1, smokedCigarettes: 1}, {day: 2, smokedCigarettes: 4} ...]
-    console.log("Final Data:");
-    console.log(data);
     return res.status(200).json(data);
   } catch (error) {
     handleError(res, error, "get_smoking_stats");

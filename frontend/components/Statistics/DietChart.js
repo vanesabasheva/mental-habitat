@@ -71,8 +71,6 @@ function DietChart() {
   const statsCtx = useContext(StatsContext);
   const stats = statsCtx.stats;
 
-  console.log("in diet Chart" + JSON.stringify(stats));
-
   const fetchData = async (currentDate) => {
     if (timePeriod === "week") {
       const { startDate, endDate } = getWeekRange(currentDate);

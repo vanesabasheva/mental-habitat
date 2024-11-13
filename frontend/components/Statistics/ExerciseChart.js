@@ -162,7 +162,7 @@ function ExerciseChart() {
     } else {
       data.forEach((element) => {
         const dayIndex = element._id - 1;
-        console.log("Distance" + element.totalDistance);
+
         // Convert Decimal128 value to a number for usage
         console.log(JSON.stringify(element));
 
@@ -241,11 +241,11 @@ function ExerciseChart() {
           xAxisColor={"lightgray"}
           yAxisTextStyle={{ color: "lightgray" }}
           stepValue={typeData === "Duration" ? 30 : 3}
-          maxValue={typeData === "Duration" ? 120 : 15}
+          maxValue={typeData === "Duration" ? 150 : 15}
           noOfSections={5}
           yAxisLabelTexts={
             typeData === "Duration"
-              ? ["0", "30m", "1h", "90m", "2h"]
+              ? ["0", "30m", "1h", "90m", "2h", "150m"]
               : ["0km", "3km", "6km", "9km", "12km", "15km"]
           }
           labelWidth={40}

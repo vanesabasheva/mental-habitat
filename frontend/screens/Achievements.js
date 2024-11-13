@@ -33,7 +33,7 @@ function Achievements({ navigation }) {
             fontFamily: "robotomono-regular",
             fontSize: 14,
           }}>
-          {level} of 5
+          {level} of 4
         </Text>
       </View>
       <View style={styles.planetRowContainer}>
@@ -54,7 +54,7 @@ function Achievements({ navigation }) {
           </View>
         ))}
 
-        {LEVELS.slice(level - 1, LEVELS.length).map((level, index) => (
+        {LEVELS.slice(level - 1, LEVELS.length - 1).map((level, index) => (
           <View
             key={index}
             style={[
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.primaryBackgroundLight,
-    paddingTop: deviceHeight * 0.1,
+    paddingTop: deviceHeight * 0.07,
     gap: 50,
     padding: 32,
     alignItems: "center",

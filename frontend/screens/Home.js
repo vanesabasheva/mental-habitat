@@ -43,7 +43,7 @@ export const LEVELS = [
     planetName: "KP403",
     planetDescription: "a place of peace and quite",
     story:
-      "Planet KP403, known to the interstellar community as Whisper, has long been shrouded in mystery. Ancient space records hint at a civilization that once thrived here, skilled in harmonizing technology with nature. However, hundreds of years ago, a sudden and unexplained silence fell over the planet, and it has since been left untouched and forgotten by the wider galaxy. Legend has it that KP403 was a hub for the brightest minds, a place where scientists and artists alike gathered to share knowledge and ideas. Their cities were said to glow gently at night, a testament to their commitment to balance and peace. However one fateful day... balance and peace. However one fateful day...,balance and peace. However one fateful day...,balance and peace. However one fateful day...,balance and peace. However one fateful day...",
+      'Planet KP403, known to the interstellar community as Whisper, has long been shrouded in mystery. Ancient space records hint at a civilization that once thrived here, skilled in harmonizing technology with nature. However, hundreds of years ago, a sudden and unexplained silence fell over the planet, and it has since been left untouched and forgotten by the wider galaxy. Legend has it that KP403 was a hub for the brightest minds, a place where scientists and artists alike gathered to share knowledge and ideas. Their cities were said to glow gently at night, a testament to their commitment to balance and peace. However one fateful day... , the communications from KP403 ceased. No distress signals, no farewell messages—just silence. This event came to be known as "The Quiet," and it sparked curiosity and speculation across many worlds. Did a natural disaster strike? Did their experiments backfire? Or did they simply choose to cut themselves off from the universe? The planet was left in a state of preservation, encapsulated in its last moments like a time capsule waiting to be discovered. The atmosphere and environment remain stable, suggesting that whatever happened didn’t disrupt the ecological balance. Now, centuries later, Captain Starling and his crew aboard the Odyssey are the first to set foot on this enigmatic world.',
     images: [
       require("../assets/imgs/level1.webp"),
       require("../assets/imgs/level1-2.webp"),
@@ -71,6 +71,7 @@ export const LEVELS = [
     images: [
       require("../assets/imgs/level3.webp"),
       require("../assets/imgs/level3-2.webp"),
+      require("../assets/imgs/level3-3.webp"),
     ],
   },
   {
@@ -157,7 +158,8 @@ function HomeScreen() {
     fetchStats();
   }, [levelProgress]);
 
-  const level = LEVELS[currentLevel - 1];
+  const level =
+    currentLevel < LEVELS.length ? LEVELS[currentLevel - 1] : LEVELS[3];
 
   return (
     <>
@@ -342,7 +344,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     //height: screenHeight * 0.9,
-    marginTop: 30,
+    marginTop: screenHeight * 0.1,
     width: screenWidth,
     margin: 0,
     backgroundColor: "white",
@@ -358,7 +360,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    backgroundColor: Colors.primaryBackgroundLight,
+    backgroundColor: "white",
   },
   textStyle: {
     color: "white",

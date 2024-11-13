@@ -23,7 +23,6 @@ const Toast = ({ setToast, icon, text }) => {
 
   useEffect(() => {
     animate();
-    console.log("In toastr! " + "text " + text);
   }, [text, icon]);
 
   return (

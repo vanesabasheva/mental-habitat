@@ -63,7 +63,6 @@ function SubstanceChart({ mode }) {
       setCurrentDate(() => new Date(startDate));
       setCurrentEndDate(() => new Date(endDate));
       const data = await fetchWeeklyData(startDate, endDate);
-      console.log("Final Data");
       if (data.error) {
         // TODO: handle errors
         return;
